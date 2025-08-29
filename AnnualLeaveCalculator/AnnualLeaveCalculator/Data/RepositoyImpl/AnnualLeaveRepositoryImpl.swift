@@ -1,0 +1,58 @@
+//
+//  AnnualLeaveRepositoryImpl.swift
+//  AnnualLeaveCalculator
+//
+//  Created by 김경록 on 8/23/25.
+//
+
+import Foundation
+
+struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
+    
+    private let session: URLSession
+    
+    init(session: URLSession = .shared) {
+        self.session = session
+    }
+    
+    func calculate(
+        calculationType: Int,
+        fiscalYear: String?,
+        hireDate: String,
+        referenceDate: String,
+        nonWorkingPeriods: [NonWorkingPeriod]? = [],
+        companyHolidays: [String]? = []
+    ) async throws -> AnnualLeaveDTO {
+        guard let request = try? AnnualLeaveTarget.calculate(
+            calculationType: calculationType,
+            fiscalYear: fiscalYear,
+            hireDate: hireDate,
+            referenceDate: referenceDate,
+            nonWorkingPeriods: nonWorkingPeriods,
+            companyHolidays: companyHolidays
+        ).asURLRequest() else {
+            throw NetworkError.invalidURLError
+        }
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.unknown
+        }
+        
+        switch httpResponse.statusCode {
+        case 200...299:
+            break
+        case 401:
+            throw NetworkError.unauthorized
+        default:
+            throw NetworkError.requestFailed
+        }
+        do {
+            let decoded = try JSONDecoder().decode(AnnualLeaveDTO.self, from: data)
+            return decoded
+        } catch {
+            print(NetworkError.decodingFailed.errorDescription ?? "디코딩 실패")
+            throw NetworkError.decodingFailed
+        }
+    }
+}
