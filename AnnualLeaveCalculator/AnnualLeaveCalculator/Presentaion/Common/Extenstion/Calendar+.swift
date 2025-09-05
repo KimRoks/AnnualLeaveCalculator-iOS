@@ -35,3 +35,7 @@ extension Date {
         return formatter.string(from: self)
     }
 }
+
+extension TimeZone {
+    static let korea = TimeZone(identifier: "Asia/Seoul")!
+}
