@@ -29,7 +29,7 @@ public protocol AnnualLeaveCalculatorUseCase {
         referenceDate: String,
         nonWorkingPeriods: [NonWorkingPeriod]?,
         companyHolidays: [String]?
-    ) async throws -> AnnualLeaveDTO
+    ) async throws -> CalculationResultDTO
 }
 
 final class DefaultAnnualLeaveCalculatorUseCase: AnnualLeaveCalculatorUseCase {
@@ -46,7 +46,7 @@ final class DefaultAnnualLeaveCalculatorUseCase: AnnualLeaveCalculatorUseCase {
         referenceDate: String,
         nonWorkingPeriods: [NonWorkingPeriod]?,
         companyHolidays: [String]?
-    ) async throws -> AnnualLeaveDTO {
+    ) async throws -> CalculationResultDTO {
         do {
             return try await annualLeaveRepository.calculate(
                 calculationType: calculationType,

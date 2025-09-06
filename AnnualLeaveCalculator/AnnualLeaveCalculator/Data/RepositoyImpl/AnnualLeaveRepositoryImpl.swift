@@ -22,7 +22,7 @@ struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
         referenceDate: String,
         nonWorkingPeriods: [NonWorkingPeriod]? = [],
         companyHolidays: [String]? = []
-    ) async throws -> AnnualLeaveDTO {
+    ) async throws -> CalculationResultDTO {
         guard let request = try? AnnualLeaveTarget.calculate(
             calculationType: calculationType,
             fiscalYear: fiscalYear,
@@ -33,12 +33,13 @@ struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
         ).asURLRequest() else {
             throw NetworkError.invalidURLError
         }
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw NetworkError.unknown
         }
-        
+
         switch httpResponse.statusCode {
         case 200...299:
             break
@@ -47,8 +48,10 @@ struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
         default:
             throw NetworkError.requestFailed
         }
+
         do {
-            let decoded = try JSONDecoder().decode(AnnualLeaveDTO.self, from: data)
+            let decoded = try JSONDecoder().decode(CalculationResultDTO.self, from: data)
+                        
             return decoded
         } catch {
             print(NetworkError.decodingFailed.errorDescription ?? "디코딩 실패")

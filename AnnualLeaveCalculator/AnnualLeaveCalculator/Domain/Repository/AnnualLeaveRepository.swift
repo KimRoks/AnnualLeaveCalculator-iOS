@@ -15,5 +15,5 @@ public protocol AnnualLeaveRepository {
         referenceDate: String,
         nonWorkingPeriods: [NonWorkingPeriod]?,
         companyHolidays: [String]?
-    ) async throws -> AnnualLeaveDTO
+    ) async throws -> CalculationResultDTO
 }
