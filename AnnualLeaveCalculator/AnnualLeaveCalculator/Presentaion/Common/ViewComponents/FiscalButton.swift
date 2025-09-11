@@ -47,16 +47,9 @@ final class FiscalButton: UIButton {
 
     private func setupConfiguration() {
         var config = UIButton.Configuration.filled()
-        config.image = UIImage(systemName: "calendar")
-        config.imagePlacement = .leading
-        config.imagePadding = 8
         config.baseBackgroundColor = .systemGray6
         config.cornerStyle = .medium
         
-        // 1) 제목은 좌측 정렬
-        config.titleAlignment = .leading
-        
-        // 2) 버튼 콘텐츠 자체도 좌측으로 정렬
         config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
         
         config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
@@ -66,11 +59,6 @@ final class FiscalButton: UIButton {
         }
         
         self.configuration = config
-
-//        self.contentHorizontalAlignment = .leading          // 🔑 핵심
-//        self.titleLabel?.textAlignment = .left            // 보강
-//        self.titleLabel?.lineBreakMode = .byTruncatingTail  // 길면 … 처리
-        
         self.configuration = config
         updateConfigurationText()
     }
