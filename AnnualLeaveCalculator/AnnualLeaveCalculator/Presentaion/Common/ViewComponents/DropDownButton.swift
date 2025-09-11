@@ -6,8 +6,8 @@
 //
 
 import UIKit
+import SnapKit
 
-// 서버 스펙과 동일한 type 매핑
 enum NonWorkingType: Int {
     case parentalLeave              = 1   // 육아휴직
     case maternityLeave             = 2   // 출산전후휴가
@@ -47,21 +47,23 @@ enum NonWorkingType: Int {
     }
 }
 
+// MARK: - 버튼
 
 final class DropDownButton: UIButton {
 
-    // MARK: - Public
+    // MARK: Public
     private(set) var selectedItem: String?
     private(set) var selectedType: NonWorkingType?
     var selectedTypeId: Int? { selectedType?.rawValue }
 
-    /// 문자열만 필요할 때
     var onItemSelected: ((String) -> Void)?
-    /// type까지 필요할 때
     var onItemSelectedType: ((String, NonWorkingType) -> Void)?
 
-    // MARK: - Private
-    // 내부 고정 항목: (표시 문자열, 서버 type)
+    // 최대 높이(화면 높이의 비율). 0.4 => 40%
+    var maxHeightFraction: CGFloat = 0.4
+    var rowHeight: CGFloat = 48
+
+    // MARK: Private
     private let items: [(title: String, type: NonWorkingType)] = [
         ("육아휴직", .parentalLeave),
         ("출산전후휴가", .maternityLeave),
@@ -80,12 +82,14 @@ final class DropDownButton: UIButton {
         ("개인질병(업무상 질병X)으로 인한 휴직", .personalIllnessLeave)
     ]
 
-    // MARK: - Init
+    // MARK: Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupButton()
         rebuildMenu()
         applyTitle("사유 선택")
+        showsMenuAsPrimaryAction = false
+        addTarget(self, action: #selector(didTap), for: .touchUpInside)
     }
 
     required init?(coder: NSCoder) {
@@ -93,32 +97,28 @@ final class DropDownButton: UIButton {
         setupButton()
         rebuildMenu()
         applyTitle("사유 선택")
+        showsMenuAsPrimaryAction = false
+        addTarget(self, action: #selector(didTap), for: .touchUpInside)
     }
 
-    // MARK: - UI
+    // MARK: UI
     private func setupButton() {
-        var config = UIButton.Configuration.filled()
-        config.baseBackgroundColor = .systemGray6
-        config.baseForegroundColor = .black
-        config.cornerStyle = .medium
-        config.titleLineBreakMode = .byTruncatingTail
+        var configuration = UIButton.Configuration.filled()
+        configuration.baseBackgroundColor = .systemGray6
+        configuration.baseForegroundColor = .black
+        configuration.cornerStyle = .medium
+        configuration.titleLineBreakMode = .byTruncatingTail
 
-        // 드롭다운 아이콘 (오른쪽)
-        let sym = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
-        config.image = UIImage(systemName: "chevron.down", withConfiguration: sym)
-        config.imagePlacement = .trailing
-        config.imagePadding = 6
+        let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
+        configuration.image = UIImage(systemName: "chevron.down", withConfiguration: symbolConfiguration)
+        configuration.imagePlacement = .trailing
+        configuration.imagePadding = 6
 
-        // 텍스트 스타일
-        config.attributedTitle = AttributedString("사유 선택", attributes: AttributeContainer([
+        configuration.attributedTitle = AttributedString("사유 선택", attributes: AttributeContainer([
             .font: UIFont.pretendard(style: .medium, size: 14)
         ]))
-        
-        // 패딩
-        config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
-
-        self.configuration = config
-        self.showsMenuAsPrimaryAction = true // 탭 시 바로 메뉴 표시
+        configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
+        self.configuration = configuration
     }
 
     private func rebuildMenu() {
@@ -129,44 +129,145 @@ final class DropDownButton: UIButton {
                 self?.onItemSelectedType?(item.title, item.type)
             }
         }
-        self.menu = UIMenu(options: .displayInline, children: actions)
-        self.isEnabled = !items.isEmpty
+        menu = UIMenu(options: .displayInline, children: actions)
+        isEnabled = !items.isEmpty
     }
 
     private func applySelection(title: String, type: NonWorkingType) {
         selectedItem = title
         selectedType = type
         applyTitle(title)
-        // 체크표시 상태 갱신
         rebuildMenu()
     }
 
     private func applyTitle(_ title: String) {
-        guard var cfg = self.configuration else { return }
-        cfg.attributedTitle = AttributedString(title, attributes: AttributeContainer([
+        guard var buttonConfiguration = configuration else { return }
+        buttonConfiguration.attributedTitle = AttributedString(title, attributes: AttributeContainer([
             .font: UIFont.pretendard(style: .medium, size: 14)
         ]))
-        self.configuration = cfg
+        configuration = buttonConfiguration
     }
 
-    /// 외부에서 초기 선택값을 세팅해야 할 때 (타이틀 기준)
+    // MARK: Public Helpers
     func preselect(title: String) {
         guard let type = NonWorkingType.from(title: title) else { return }
         applySelection(title: title, type: type)
     }
 
-    /// 외부에서 초기 선택값을 세팅해야 할 때 (type 기준)
     func preselect(type: NonWorkingType) {
         if let pair = items.first(where: { $0.type == type }) {
             applySelection(title: pair.title, type: pair.type)
         }
     }
 
-    /// 선택 초기화
     func reset() {
         selectedItem = nil
         selectedType = nil
         applyTitle("사유 선택")
         rebuildMenu()
+    }
+
+    // MARK: Actions
+    @objc private func didTap() {
+        guard let parentViewController = parentViewController else { return }
+
+        let popoverController = DropdownPopoverController(
+            items: items.map { .init(title: $0.title, type: $0.type) },
+            selectedTitle: selectedItem,
+            rowHeight: rowHeight
+        )
+        popoverController.onSelect = { [weak self] item in
+            self?.applySelection(title: item.title, type: item.type)
+            self?.onItemSelected?(item.title)
+            self?.onItemSelectedType?(item.title, item.type)
+        }
+
+        popoverController.modalPresentationStyle = .popover
+        if let popoverPresentationController = popoverController.popoverPresentationController {
+            popoverPresentationController.sourceView = self
+            popoverPresentationController.sourceRect = bounds
+            popoverPresentationController.permittedArrowDirections = [.up, .down]
+            popoverPresentationController.delegate = popoverController // iPhone에서도 팝오버 유지
+        }
+
+        // 높이 계산: 아이템 총 높이 vs 화면 40%
+        let screenHeight = UIScreen.main.bounds.height
+        let maxHeight = screenHeight * maxHeightFraction
+        let totalHeight = CGFloat(items.count) * rowHeight
+        let finalHeight = min(maxHeight, totalHeight)
+        // 너비: 버튼 너비 기준, 최소 250 보장
+        let width = max(bounds.width, 250)
+        popoverController.preferredContentSize = CGSize(width: width, height: finalHeight)
+
+        parentViewController.present(popoverController, animated: true)
+    }
+}
+
+// MARK: - 팝오버 컨트롤러(스크롤 지원)
+private final class DropdownPopoverController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIPopoverPresentationControllerDelegate {
+
+    struct Item {
+        let title: String
+        let type: NonWorkingType
+    }
+
+    var onSelect: ((Item) -> Void)?
+
+    private let items: [Item]
+    private let selectedTitle: String?
+    private let rowHeight: CGFloat
+
+    private let tableView = UITableView(frame: .zero, style: .plain)
+
+    init(items: [Item], selectedTitle: String?, rowHeight: CGFloat) {
+        self.items = items
+        self.selectedTitle = selectedTitle
+        self.rowHeight = rowHeight
+        super.init(nibName: nil, bundle: nil)
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.rowHeight = rowHeight
+        tableView.tableFooterView = UIView()
+        tableView.alwaysBounceVertical = true
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+
+        view.addSubview(tableView)
+        tableView.snp.makeConstraints { $0.edges.equalToSuperview() }
+    }
+
+    // iPhone에서도 팝오버 유지
+    func adaptivePresentationStyle(for controller: UIPresentationController, traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+        return .none
+    }
+
+    // UITableViewDataSource
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { items.count }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let item = items[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        var configuration = cell.defaultContentConfiguration()
+        configuration.text = item.title
+        configuration.textProperties.numberOfLines = 1
+        configuration.textProperties.font = .pretendard(style: .medium, size: 14)
+        
+        cell.contentConfiguration = configuration
+        cell.accessoryType = (item.title == selectedTitle) ? .checkmark : .none
+        return cell
+    }
+
+    // UITableViewDelegate
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let item = items[indexPath.row]
+        onSelect?(item)
+        dismiss(animated: true)
     }
 }
