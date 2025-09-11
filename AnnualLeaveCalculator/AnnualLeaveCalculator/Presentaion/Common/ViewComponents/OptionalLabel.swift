@@ -9,9 +9,9 @@ import UIKit
 
 final class OptionalLabel: UILabel {
     // MARK: - Init
-    init() {
+    init(title: String = "선택사항") {
         super.init(frame: .zero)
-        setupUI()
+        setupUI(title: title)
     }
     
     required init?(coder: NSCoder) {
@@ -19,9 +19,13 @@ final class OptionalLabel: UILabel {
     }
     
     // MARK: - Private Methods
-    private func setupUI() {
-        text = "선택사항"
+    private func setupUI(title: String) {
+        text = title
         textColor = UIColor(hex: "#8E8E93")
         font = .pretendard(style: .regular, size: 12)
+    }
+    
+    func setTitle(for title: String) {
+        self.text = title
     }
 }

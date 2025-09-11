@@ -53,7 +53,11 @@ final class DateButton: UIButton {
         config.baseForegroundColor = .secondaryLabel   // 선택 전 회색
         config.baseBackgroundColor = .systemGray6
         config.cornerStyle = .medium
-
+        config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
+            var out = incoming
+            out.font = UIFont.pretendard(style: .medium, size: 14)
+            return out
+        }
         self.configuration = config
 
         updateConfigurationText()
@@ -242,6 +246,24 @@ extension DatePickerSheetController: UIPickerViewDelegate, UIPickerViewDataSourc
         default: return "\(days[row])일"
         }
     }
+    
+    func pickerView(_ pickerView: UIPickerView,
+                      viewForRow row: Int,
+                      forComponent component: Int,
+                      reusing view: UIView?) -> UIView {
+          let label = (view as? UILabel) ?? UILabel()
+          label.textAlignment = .center
+          label.font = UIFont.pretendard(style: .medium, size: 23) 
+          label.textColor = .label
+
+          switch component {
+          case 0: label.text = "\(years[row])년"
+          case 1: label.text = "\(months[row])월"
+          default: label.text = "\(days[row])일"
+          }
+          return label
+      }
+    
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         switch component {

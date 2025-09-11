@@ -20,7 +20,7 @@ final class SubtitleLabel: UILabel {
     
     private func setupLabel(with title: String) {
         self.text = title
-        self.textColor = UIColor.systemGray
+        self.textColor = UIColor(hex: "#3C3C3C")
         self.font = .pretendard(style: .bold, size: 16)
     }
 }
