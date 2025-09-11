@@ -6,8 +6,6 @@
 //
 
 import Foundation
-import Foundation
-import Foundation
 
 public struct CalculationResultDTO: Decodable {
     public let calculationType: String
@@ -69,7 +67,8 @@ public struct CalculationResultDTO: Decodable {
         
         public let monthlyDetail: MonthlyDetail?
         public let proratedDetail: ProratedDetail?
-        
+        public let prescribedWorkingRatioForProrated: Double?
+
         public enum CodingKeys: String, CodingKey {
             case accrualPeriod
             case availablePeriod
@@ -82,6 +81,7 @@ public struct CalculationResultDTO: Decodable {
             case records
             case monthlyDetail
             case proratedDetail
+            case prescribedWorkingRatioForProrated
         }
     }
     
