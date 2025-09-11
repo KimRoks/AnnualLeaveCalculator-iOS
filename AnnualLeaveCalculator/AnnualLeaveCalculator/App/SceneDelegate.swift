@@ -16,7 +16,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = scene as? UIWindowScene else { return }
         
         let window = UIWindow(windowScene: windowScene)
-        let rootViewController = MainViewController()
+        
+        let repository = AnnualLeaveRepositoryImpl()
+        let useCase = DefaultAnnualLeaveCalculatorUseCase(annualLeaveRepository: repository)
+        let mainViewModel = MainViewModel(calculatorUseCase: useCase)
+        let rootViewController = MainViewController(viewModel: mainViewModel)
         let navigationController = LawdingNavigationController(rootViewController: rootViewController)
     
         window.rootViewController = navigationController
