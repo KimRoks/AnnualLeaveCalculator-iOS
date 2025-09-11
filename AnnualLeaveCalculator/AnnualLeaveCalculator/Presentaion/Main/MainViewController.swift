@@ -28,6 +28,8 @@ class MainViewController: BaseViewController {
     private let firstCardStackView: CardStackView = CardStackView()
     private let calculationTypeView: UIView = UIView()
     private let calculationTypeLabel = SubtitleLabel(title: "산정 방식")
+    private let calculationTypeRequiredLabel: RequiredBadgeLabel = RequiredBadgeLabel()
+    
     private let caculatationTypeButton = CalculationTypeButton(items: ["입사일", "회계연도"])
     private let helpButton1: HelpButton = HelpButton()
     
@@ -112,7 +114,7 @@ class MainViewController: BaseViewController {
         setupDetailTableView()
         setupHolidayTableView()
         bind()
-        
+        styleFirstCardBorder()
         // 회계연도 버튼이 MM.01 형태라면 month/day만 사용 → Date 자체를 넘겨두고 VM에서 "MM-dd"로 변환
         viewModel.setFiscalYearDate.send(fiscalYearButton.currentDate)
         // 초기 산정 방식(세그먼트 0: 입사일 기반)
@@ -157,6 +159,7 @@ class MainViewController: BaseViewController {
         calculationTypeView.addSubviews(
             calculationTypeLabel,
             helpButton1,
+            calculationTypeRequiredLabel,
             caculatationTypeButton
         )
         
@@ -236,9 +239,14 @@ class MainViewController: BaseViewController {
         }
         
         caculatationTypeButton.snp.makeConstraints {
-            $0.top.equalTo(calculationTypeLabel.snp.bottom).offset(20)
+            $0.top.equalTo(calculationTypeRequiredLabel.snp.bottom).offset(18)
             $0.leading.trailing.equalToSuperview()
             $0.bottom.equalToSuperview()
+        }
+        
+        calculationTypeRequiredLabel.snp.makeConstraints {
+            $0.top.equalTo(calculationTypeLabel.snp.bottom).offset(3)
+            $0.leading.equalToSuperview()
         }
         
         helpButton1.snp.makeConstraints {
@@ -483,6 +491,13 @@ class MainViewController: BaseViewController {
         UIView.animate(withDuration: 0.25) {
             self.view.layoutIfNeeded()
         }
+    }
+    
+    private func styleFirstCardBorder() {
+        firstCardStackView.layer.cornerRadius = 12
+        firstCardStackView.layer.masksToBounds = true
+        firstCardStackView.layer.borderWidth = 1.5
+        firstCardStackView.layer.borderColor = UIColor(hex: "#506BFA").cgColor
     }
 }
 
