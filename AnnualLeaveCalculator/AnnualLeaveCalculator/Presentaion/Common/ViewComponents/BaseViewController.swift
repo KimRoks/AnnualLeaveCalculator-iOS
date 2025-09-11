@@ -11,6 +11,7 @@ class BaseViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         enableInteractivePopGesture()
+        view.backgroundColor = UIColor(hex: "#F5F5F5")
     }
     
     private func enableInteractivePopGesture() {
