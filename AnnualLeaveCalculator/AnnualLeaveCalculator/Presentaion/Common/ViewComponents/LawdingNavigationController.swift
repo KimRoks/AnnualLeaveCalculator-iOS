@@ -21,7 +21,7 @@ final class LawdingNavigationController: UINavigationController {
     private let infoButton: UIButton = {
         let button = UIButton(type: .system)
         
-        let image = UIImage(systemName: "info.circle.fill")
+        let image = UIImage(systemName: "line.3.horizontal")
         button.setImage(image, for: .normal)
         button.tintColor = UIColor(hex: "0015FF")
         button.addTarget(nil, action: #selector(infoButtonTapped), for: .touchUpInside)
@@ -38,7 +38,8 @@ final class LawdingNavigationController: UINavigationController {
     }
     
     @objc private func infoButtonTapped() {
-        print("오른쪽 버튼 탭")
+        let infoViewController = InfoViewController()
+        self.pushViewController(infoViewController, animated: true)
     }
     
     private func setupCommonNavigationBar() {
