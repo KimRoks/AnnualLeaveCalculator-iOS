@@ -8,11 +8,16 @@ import UIKit
 
 final class LawdingNavigationController: UINavigationController {
     
+    private let navigationFontSize: CGFloat = 20
+    
     // 공용 왼쪽 타이틀 Label
-    private let titleLabel: UILabel = {
-        let label = UILabel()
+    private lazy var titleLabel: PaddedLabel = {
+        let label = PaddedLabel(insets: UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0))
         label.text = "Lawding"
-        label.font = .pretendard(style: .bold, size: 20)
+        label.font = .pretendard(
+            style: .bold,
+            size: self.navigationFontSize
+        )
         label.textColor = UIColor(hex: "0015FF")
         return label
     }()
@@ -20,11 +25,21 @@ final class LawdingNavigationController: UINavigationController {
     // 공용 오른쪽 버튼
     private let infoButton: UIButton = {
         let button = UIButton(type: .system)
-        
-        let image = UIImage(systemName: "line.3.horizontal")
-        button.setImage(image, for: .normal)
-        button.tintColor = UIColor(hex: "0015FF")
+
+        var config = UIButton.Configuration.plain()
+        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 17, weight: .medium)
+        config.image = UIImage(systemName: "line.3.horizontal", withConfiguration: symbolConfig)
+
+        config.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
+
+        config.baseForegroundColor = UIColor(hex: "0015FF")
+        button.configuration = config
+
+        button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+        button.widthAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
+
         button.addTarget(nil, action: #selector(infoButtonTapped), for: .touchUpInside)
+
         return button
     }()
     
@@ -57,14 +72,22 @@ final class LawdingNavigationController: UINavigationController {
         if viewControllers.count > 1 {
             // 스택이 2 이상일 때 → Back 버튼
             let backButton = UIButton(type: .system)
-            let image = UIImage(systemName: "chevron.left")?
-                .withConfiguration(UIImage.SymbolConfiguration(weight: .medium))
-            backButton.setImage(image, for: .normal)
+            var config = UIButton.Configuration.plain()
+            let chevron = UIImage(systemName: "chevron.left")?
+                .applyingSymbolConfiguration(.init(weight: .medium))
+            config.image = chevron
             
-            backButton.tintColor = UIColor(hex: "0015FF")
-            backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
-            
+            config.attributedTitle = AttributedString(
+                "Back",
+                attributes: AttributeContainer([.font: UIFont.pretendard(style: .bold, size: navigationFontSize)])
+            )
+            config.imagePadding = 4
+            config.baseForegroundColor = UIColor(hex: "0015FF")
+            config.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 0)
+            backButton.configuration = config
+
             viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
+            backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         } else {
             // 루트일 때 → Lawding 타이틀
             viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
