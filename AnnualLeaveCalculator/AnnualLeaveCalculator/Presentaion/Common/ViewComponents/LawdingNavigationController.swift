@@ -88,10 +88,24 @@ final class LawdingNavigationController: UINavigationController {
 
             viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)
             backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+            
+            if viewController is ResultViewController {
+                let titleLabel = UILabel()
+                titleLabel.text = "계산결과"
+                titleLabel.font = .pretendard(style: .bold, size: navigationFontSize)
+                titleLabel.textColor = UIColor(hex: "0015FF")
+                titleLabel.textAlignment = .center
+                titleLabel.adjustsFontSizeToFitWidth = true
+                titleLabel.minimumScaleFactor = 0.9
+                viewController.navigationItem.titleView = titleLabel
+            } else {
+                viewController.navigationItem.titleView = nil
+            }
         } else {
             // 루트일 때 → Lawding 타이틀
             viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
             viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: infoButton)
+            viewController.navigationItem.titleView = nil
         }
     }
     @objc private func backButtonTapped() {
