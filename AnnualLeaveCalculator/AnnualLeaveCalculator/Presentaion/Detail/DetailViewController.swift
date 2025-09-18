@@ -19,14 +19,15 @@ final class DetailViewController: BaseViewController {
     let didFinish = PassthroughSubject<[DetailRow], Never>()
     
     // MARK: Card1
-    private let card1 = CardStackView()
-    private let card1view = UIView()
+    private let cardStackView = CardStackView()
+    private let cardView = UIView()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "특이 사항이 있는 기간"
         label.font = .pretendard(style: .bold, size: 23)
-        label.textColor = .label
+        label.textColor = UIColor(hex: "#3C3C3C")
+        
         return label
     }()
     
@@ -38,7 +39,6 @@ final class DetailViewController: BaseViewController {
         return label
     }()
     
-    // 사유
     private let reasonLabel: UILabel = {
         let label = UILabel()
         label.text = "사유"
@@ -47,9 +47,9 @@ final class DetailViewController: BaseViewController {
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
     }()
-    private let dropDownButton = DropDownButton()
     
-    // 시작일
+    private let dropDownButton = DropDownButton(kind: .nonWorkingTypes)
+    
     private let startDateLabel: UILabel = {
         let label = UILabel()
         label.text = "시작일"
@@ -61,7 +61,6 @@ final class DetailViewController: BaseViewController {
     
     private let startDateButton = DateButton()
     
-    // 종료일
     private let endDateLabel: UILabel = {
         let label = UILabel()
         label.text = "종료일"
@@ -70,44 +69,44 @@ final class DetailViewController: BaseViewController {
         label.setContentCompressionResistancePriority(.required, for: .horizontal)
         return label
     }()
+    
     private let endDateButton = DateButton()
     
-    // 가로 행들
     private let reasonRow: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        sv.alignment = .center
-        sv.distribution = .fill
-        return sv
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .center
+        stackView.distribution = .fill
+        return stackView
     }()
     
     private let startRow: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        sv.alignment = .center
-        sv.distribution = .fill
-        return sv
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .center
+        stackView.distribution = .fill
+        return stackView
     }()
     
     private let endRow: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .horizontal
-        sv.spacing = 8
-        sv.alignment = .center
-        sv.distribution = .fill
-        return sv
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 8
+        stackView.alignment = .center
+        stackView.distribution = .fill
+        return stackView
     }()
     
     // reason / start / end 세 줄을 세로로 묶는 스택
     private let infoStack: UIStackView = {
-        let sv = UIStackView()
-        sv.axis = .vertical
-        sv.spacing = 16
-        sv.alignment = .fill
-        sv.distribution = .fill
-        return sv
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 16
+        stackView.alignment = .fill
+        stackView.distribution = .fill
+        return stackView
     }()
     
     private let confirmButton: ConfirmButton = ConfirmButton(title: "추가하기")
@@ -124,17 +123,18 @@ final class DetailViewController: BaseViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(hex: "#F5F5F5")
         setupLayout()
         setupConstraints()
         bind()
-        dropDownButton.onItemSelected = { [weak self] selected in
-            // 필요 시 선택시 바로 처리
-            print("선택된 값: \(selected)")
+        dropDownButton.onItemSelected = { [weak self] _ in
             self?.haptics(.light)
         }
         
-        confirmButton.addTarget(self, action: #selector(didTapConfirm), for: .touchUpInside)
+        confirmButton.addTarget(
+            self,
+            action: #selector(didTapConfirm),
+            for: .touchUpInside
+        )
     }
     
     /// 화면이 Pop될 때 상위로 현재 데이터 전달
@@ -147,18 +147,18 @@ final class DetailViewController: BaseViewController {
     
     // MARK: - Bind
     private func bind() {
-        // 에러 처리 (토스트/알럿 등)
         viewModel.error
             .receive(on: RunLoop.main)
-            .sink { [weak self] err in
-                self?.showAlert(message: err.localizedDescription)
+            .sink { [weak self] error in
+                self?.showAlert(message: error.localizedDescription)
             }
             .store(in: &bag)
         
         viewModel.didAdd
             .receive(on: RunLoop.main)
             .sink { [weak self] in
-                self?.dropDownButton.reset()          
+                self?.dropDownButton.reset()
+                self?.navigationController?.popViewController(animated: true)
             }
             .store(in: &bag)
     }
@@ -180,44 +180,30 @@ final class DetailViewController: BaseViewController {
         
         // ViewModel에 추가 요청
         viewModel.add.send(.init(reason: reason, start: startDate, end: endDate))
-        self.navigationController?.popViewController(animated: true)
     }
     
     private func haptics(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        let gen = UIImpactFeedbackGenerator(style: style)
-        gen.impactOccurred()
+        let generator = UIImpactFeedbackGenerator(style: style)
+        generator.impactOccurred()
     }
     
     // MARK: - Layout
     private func setupLayout() {
         view.addSubviews(
-            card1
+            cardStackView
         )
-        card1.addArrangedSubview(card1view)
+        cardStackView.addArrangedSubview(cardView)
         
-        // spacer
-        let reasonSpacer = UIView()
-        let startSpacer = UIView()
-        let endSpacer = UIView()
-        [reasonSpacer, startSpacer, endSpacer].forEach {
-            $0.setContentHuggingPriority(.defaultLow, for: .horizontal)
-            $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        }
-        
-        // 행 구성
         reasonRow.addArrangedSubviews(
             reasonLabel,
-            reasonSpacer,
             dropDownButton
         )
         startRow.addArrangedSubviews(
             startDateLabel,
-            startSpacer,
             startDateButton
         )
         endRow.addArrangedSubviews(
             endDateLabel,
-            endSpacer,
             endDateButton
         )
         infoStack.addArrangedSubviews(
@@ -226,8 +212,7 @@ final class DetailViewController: BaseViewController {
             endRow
         )
         
-        // card1 내부
-        card1view.addSubviews(
+        cardView.addSubviews(
             titleLabel,
             subTitleLabel,
             infoStack,
@@ -236,14 +221,13 @@ final class DetailViewController: BaseViewController {
     }
     
     private func setupConstraints() {
-        // Card1
-        card1.snp.makeConstraints {
+        cardStackView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide).offset(16)
             $0.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
             $0.trailing.equalTo(view.safeAreaLayoutGuide).inset(20)
         }
         
-        // Card1 내부
+        // Card 내부
         titleLabel.snp.makeConstraints {
             $0.top.leading.trailing.equalToSuperview()
         }
@@ -263,7 +247,7 @@ final class DetailViewController: BaseViewController {
         }
         
         dropDownButton.snp.makeConstraints {
-            $0.width.equalTo(view.snp.width).multipliedBy(0.6)
+            $0.width.equalTo(view.snp.width).multipliedBy(0.5)
         }
         
         startDateButton.snp.makeConstraints {
@@ -273,6 +257,7 @@ final class DetailViewController: BaseViewController {
             $0.width.equalTo(dropDownButton)
         }
         
-        endDateButton.snp.makeConstraints { $0.width.equalTo(startDateButton) }
+        endDateButton.snp.makeConstraints { $0.width.equalTo(startDateButton)
+        }
     }
 }
