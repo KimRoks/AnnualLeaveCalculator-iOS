@@ -354,8 +354,18 @@ class MainViewController: BaseViewController {
         caculatationTypeButton.addTarget(self, action: #selector(segmentedChanged(_:)), for: .valueChanged)
         addHolidayButton.addTarget(self, action: #selector(pushToHolidaysView), for: .touchUpInside)
         addDetailButton.addTarget(self, action: #selector(pushToDetailView), for: .touchUpInside)
-        helpButton1.addTarget(self, action: #selector(pushToHelp1View), for: .touchUpInside)
-        
+       
+        helpButton1.addAction(UIAction { [weak self] _ in
+            self?.presentHelp(.calculationType)
+        }, for: .touchUpInside)
+
+        helpButton2.addAction(UIAction { [weak self] _ in
+            self?.presentHelp(.detailPeriods)
+        }, for: .touchUpInside)
+
+        helpButton3.addAction(UIAction { [weak self] _ in
+            self?.presentHelp(.companyHolidays)
+        }, for: .touchUpInside)
         
         // DateButton 값 변경을 VM에 반영
         hireDateButton.onDateChanged = { [weak self] date in
@@ -399,15 +409,12 @@ class MainViewController: BaseViewController {
             self.view.layoutIfNeeded()
         }
     }
-    
-    @objc
-    private func pushToHelp1View() {
-        help1VC.modalPresentationStyle = .overCurrentContext
-        help1VC.modalTransitionStyle = .crossDissolve
 
-        navigationController?.present(help1VC, animated: true)
+    private func presentHelp(_ kind: QuickHelpKind) {
+        let helpVC = QuickHelpViewController(kind: kind)
+        navigationController?.present(helpVC, animated: true)
     }
-    
+
     @objc
     private func pushToDetailView() {
         let detailVM = DetailViewModel(initialRows: viewModel.details)
