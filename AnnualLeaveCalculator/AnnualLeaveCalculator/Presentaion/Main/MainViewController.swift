@@ -77,7 +77,7 @@ class MainViewController: BaseViewController {
     // MARK: ThirdCard
     private let thirdCardStackView: CardStackView = CardStackView()
     private let companyHolidaysView: UIView = UIView()
-    private let companyHolidaysLabel: SubtitleLabel = SubtitleLabel(title: "회사 자체 휴일")
+    private let companyHolidaysLabel: SubtitleLabel = SubtitleLabel(title: "공휴일 외 회사휴일")
     private let helpButton3: HelpButton = HelpButton()
     private let holidaysOptionalLabel: OptionalLabel = OptionalLabel()
     private let addHolidayButton: ChevronButton = ChevronButton(title: "추가하기")

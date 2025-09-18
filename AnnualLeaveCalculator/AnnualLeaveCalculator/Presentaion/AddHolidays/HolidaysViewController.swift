@@ -26,7 +26,7 @@ final class HolidaysViewController: BaseViewController {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "회사 자체 휴일"
+        label.text = "공휴일 외 회사휴일"
         label.font = .pretendard(style: .bold, size: 23)
         label.textColor = UIColor(hex: "#3C3C3C")
         
@@ -35,7 +35,7 @@ final class HolidaysViewController: BaseViewController {
     
     private let subTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "회사 자체 휴일은 최대 3개까지 입력 가능"
+        label.text = "공휴일 외 회사휴일은 최대 3개까지 입력 가능"
         label.font = .pretendard(style: .medium, size: 12)
         label.textColor = UIColor(hex: "#8E8E93")
         return label
