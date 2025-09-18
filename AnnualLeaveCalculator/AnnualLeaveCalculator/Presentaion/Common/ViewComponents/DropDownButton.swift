@@ -54,6 +54,31 @@ extension NonWorkingType {
     static func from(title: String) -> NonWorkingType? {
         Self.allCases.first { $0.displayTitle == title }
     }
+    var serverCode: Int {
+           switch self {
+           case .parentalLeave,
+                .maternityLeave,
+                .miscarriageStillbirth,
+                .reserveForcesTraining,
+                .industrialAccident,
+                .civicDuty,
+                .spouseMaternityLeave,
+                .familyCareLeave,
+                .unfairDismissal,
+                .illegalLockout:
+               return 1
+
+           case .unauthorizedAbsence,
+                .disciplinarySuspension,
+                .illegalStrike:
+               return 2
+
+           case .militaryServiceLeave,
+                .personalIllnessLeave,
+                .personalReasonLeave:
+               return 3
+           }
+       }
 }
 
 enum CompanyHolidayType: CaseIterable, Hashable {
@@ -96,7 +121,7 @@ final class DropDownButton: UIButton {
     // MARK: Public 상태/콜백(하위 호환 유지)
     private(set) var selectedItem: String?
     private(set) var selectedType: NonWorkingType?
-    var selectedTypeId: Int? { selectedType?.rawValue }
+    var selectedTypeId: Int? { selectedType?.serverCode }
     private(set) var selectedId: AnyHashable?
 
     var onItemSelected: ((String) -> Void)?
