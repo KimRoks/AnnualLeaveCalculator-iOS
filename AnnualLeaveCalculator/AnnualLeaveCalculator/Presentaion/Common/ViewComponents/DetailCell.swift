@@ -9,6 +9,9 @@ import UIKit
 import SnapKit
 
 final class DetailCell: UITableViewCell, Reusable {
+    
+    var onDeleteTapped: (() -> Void)?
+    
     private let reasonLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(style: .semiBold, size: 13)
@@ -43,6 +46,11 @@ final class DetailCell: UITableViewCell, Reusable {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupLayout()
         setupConstraints()
+        deleteButton.addTarget(
+            self,
+            action: #selector(handleDeleteTapped),
+            for: .touchUpInside
+        )
     }
     
     required init?(coder: NSCoder) {
@@ -74,6 +82,11 @@ final class DetailCell: UITableViewCell, Reusable {
             $0.centerY.equalToSuperview()
             $0.trailing.equalToSuperview().offset(-10)
         }
+    }
+    
+    
+    @objc private func handleDeleteTapped() {
+        onDeleteTapped?()
     }
     
     func configureCell(title: String, duration: String) {
