@@ -341,8 +341,8 @@ class MainViewController: BaseViewController {
         holidayListTableView.dataSource = self
         
         holidayListTableView.register(
-            HolidaysTableViewCell.self,
-            forCellReuseIdentifier: HolidaysTableViewCell.reuseIdentifier
+            DetailCell.self,
+            forCellReuseIdentifier: DetailCell.reuseIdentifier
         )
         holidayListTableView.isScrollEnabled = false
         holidayListTableView.rowHeight = UITableView.automaticDimension
@@ -352,7 +352,7 @@ class MainViewController: BaseViewController {
     // MARK: - Actions
     private func setupActions() {
         caculatationTypeButton.addTarget(self, action: #selector(segmentedChanged(_:)), for: .valueChanged)
-        addHolidayButton.addTarget(self, action: #selector(addHolidayTapped), for: .touchUpInside)
+        addHolidayButton.addTarget(self, action: #selector(pushToHolidaysView), for: .touchUpInside)
         addDetailButton.addTarget(self, action: #selector(pushToDetailView), for: .touchUpInside)
         helpButton1.addTarget(self, action: #selector(pushToHelp1View), for: .touchUpInside)
         
@@ -424,21 +424,26 @@ class MainViewController: BaseViewController {
     }
     
     @objc
-    private func addHolidayTapped() {
-        let picker = DatePickerSheetController(initialDate: Date())
-        picker.onDateSelected = { [weak self] date in
-            self?.viewModel.addHoliday.send(date)
-        }
-        if let sheet = picker.sheetPresentationController {
-            sheet.detents = [.custom { _ in 250 }]
-            sheet.prefersGrabberVisible = true
-        }
-        present(picker, animated: true)
+    private func pushToHolidaysView() {
+        let initial = viewModel.companyHolidayRows
+        let holidayVM = HolidaysViewModel(
+            initialRows: initial.map { HolidayItem(reason: $0.reason, date: $0.date) }
+        )
+        let addHolidayVC = HolidaysViewController(viewModel: holidayVM)
+
+        holidayVM.$rows
+            .receive(on: RunLoop.main)
+            .sink { [weak self] items in
+                let rows = items.map { CompanyHolidayRow(reason: $0.reason, date: $0.date) }
+                self?.viewModel.setHolidays.send(rows)
+            }
+            .store(in: &cancellables)
+
+        navigationController?.pushViewController(addHolidayVC, animated: true)
     }
-    
     // MARK: - Bind
     private func bind() {
-        viewModel.$companyHolidays
+        viewModel.$companyHolidayRows
             .receive(on: RunLoop.main)
             .sink { [weak self] _ in
                 guard let self = self else { return }
@@ -471,6 +476,16 @@ class MainViewController: BaseViewController {
                 self.hasPushedResult = true
                 let vc = ResultViewController(result: dto)
                 self.navigationController?.pushViewController(vc, animated: true)
+            }
+            .store(in: &cancellables)
+        
+        viewModel.error
+            .receive(on: RunLoop.main)
+            .sink { [weak self] error in
+                guard let self = self else { return }
+                let message: String
+                message = error.localizedDescription
+                self.showAlert(message: message)
             }
             .store(in: &cancellables)
     }
@@ -509,7 +524,7 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
         case detailTableView:
             return viewModel.details.count
         case holidayListTableView:
-            return viewModel.companyHolidays.count
+            return viewModel.companyHolidayRows.count
         default:
             return 0
         }
@@ -530,18 +545,31 @@ extension MainViewController: UITableViewDelegate, UITableViewDataSource {
             let item = viewModel.details[indexPath.row]
             let duration = viewModel.durationText(for: item)
             cell.configureCell(title: item.reason, duration: duration)
+            
+            cell.onDeleteTapped = { [weak self, weak cell] in
+                guard
+                    let self = self,
+                    let cell = cell,
+                    let currentIndexPath = tableView.indexPath(for: cell)
+                else {
+                    return
+                }
+                self.viewModel.removeDetails.send(currentIndexPath)
+            }
+            
             return cell
             
         case holidayListTableView:
             guard let cell = tableView.dequeueReusableCell(
-                withIdentifier: HolidaysTableViewCell.reuseIdentifier,
+                withIdentifier: DetailCell.reuseIdentifier,
                 for: indexPath
-            ) as? HolidaysTableViewCell else {
+            ) as? DetailCell else {
                 return UITableViewCell()
             }
+            let row = viewModel.companyHolidayRows[indexPath.row]
+            let dateText = row.date.toKoreanDateString()
             
-            let holidayDate = viewModel.companyHolidays[indexPath.row]
-            cell.configureCell(with: holidayDate.toKoreanDateString())
+            cell.configureCell(title: row.reason, duration: dateText)
             
             cell.onDeleteTapped = { [weak self, weak cell] in
                 guard
