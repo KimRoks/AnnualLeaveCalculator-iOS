@@ -104,7 +104,10 @@ final class LawdingNavigationController: UINavigationController {
         } else {
             // 루트일 때 → Lawding 타이틀
             viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
-            viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: infoButton)
+            
+            // TODO: 메뉴 버튼 추후 업데이트
+            
+//            viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: infoButton)
             viewController.navigationItem.titleView = nil
         }
     }
