@@ -451,9 +451,12 @@ final class ResultViewController: BaseViewController {
         
         let periodText: String = {
             if let period = result.calculationDetail.availablePeriod {
-                return "연차 가용 기간:  \(period.startDate) ~ \(period.endDate)"
+                return "가용 기간:  \(period.startDate) ~ \(period.endDate)"
             } else {
-                return "사용 가능 기간:  -"
+                guard let monthlyPeriod = result.calculationDetail.monthlyDetail?.accrualPeriod else {
+                    return "가용 기간 -"
+                }
+                return "월차 가용 기간:  \(monthlyPeriod.startDate) ~ \(monthlyPeriod.endDate)"
             }
         }()
         
