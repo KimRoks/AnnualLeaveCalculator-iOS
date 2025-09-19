@@ -139,6 +139,10 @@ final class ResultViewController: BaseViewController {
         completeButton.addAction(UIAction { [weak self] _ in
             self?.completeButtonTapped()
         },for: .touchUpInside)
+        
+        detailButton.addAction(UIAction { [weak self]_ in
+            self?.pushToResultDetailVC()
+        }, for: .touchUpInside)
     }
     
     // MARK: init
@@ -490,5 +494,10 @@ final class ResultViewController: BaseViewController {
         }
         att.append(NSAttributedString(string: periodText, attributes: [.font: font, .foregroundColor: color]))
         proratedAvailablePeriodBadgeLabel.attributedText = att
+    }
+    
+    private func pushToResultDetailVC() {
+        let resultDetailVC = ResultDetailViewController(result: result)
+        self.navigationController?.pushViewController(resultDetailVC, animated: true)
     }
 }
