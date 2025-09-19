@@ -219,26 +219,47 @@ final class ResultViewController: BaseViewController {
     private func bindDetailSections(with result: CalculationResultDTO) {
         totalLeaveDaysLabel.text = "총 연차 합계: \(result.calculationDetail.totalLeaveDays)일"
 
-        let monthly = result.calculationDetail.monthlyDetail
-        let prorated = result.calculationDetail.proratedDetail
+        let calculationDetail = result.calculationDetail
+        let monthlyDetail = calculationDetail.monthlyDetail
+        let proratedDetail = calculationDetail.proratedDetail
 
-        if let m = monthly {
-            totalMonthlyLabel.text = "월차 합계: \(m.totalLeaveDays)일"
-            monthlyAccrualPeriodLabel.text = "월차 산정기간: \(m.accrualPeriod.startDate) ~ \(m.accrualPeriod.endDate)"
-            monthlyAvailablePeriodLabel.text = "월차 가용 기간: \(m.availablePeriod.startDate) ~ \(m.availablePeriod.endDate)"
+        // 1) 월별(월차) 섹션
+        if let monthly = monthlyDetail {
+            // 월차가 있으면 월차 기준으로 표기
+            totalMonthlyLabel.text = "월차 합계: \(monthly.totalLeaveDays)일"
+            monthlyAccrualPeriodLabel.text = "월차 산정기간: \(monthly.accrualPeriod.startDate) ~ \(monthly.accrualPeriod.endDate)"
+            monthlyAvailablePeriodLabel.text = "월차 가용 기간: \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
+            monthlySectionStack.isHidden = false
+        } else if monthlyDetail == nil && proratedDetail == nil {
+            // 둘 다 없으면 calculationDetail의 정보를 '연차'로 표기
+            totalMonthlyLabel.text = "연차 합계: \(calculationDetail.totalLeaveDays)일"
+
+            if let accrual = calculationDetail.accrualPeriod {
+                monthlyAccrualPeriodLabel.text = "연차 산정기간: \(accrual.startDate) ~ \(accrual.endDate)"
+            } else {
+                monthlyAccrualPeriodLabel.text = "연차 산정기간: -"
+            }
+
+            if let available = calculationDetail.availablePeriod {
+                monthlyAvailablePeriodLabel.text = "연차 가용 기간: \(available.startDate) ~ \(available.endDate)"
+            } else {
+                monthlyAvailablePeriodLabel.text = "연차 가용 기간: -"
+            }
+
             monthlySectionStack.isHidden = false
         } else {
+            // 월차가 없고, 비례만 있는 경우 등
             monthlySectionStack.isHidden = true
             totalMonthlyLabel.text = nil
             monthlyAccrualPeriodLabel.text = nil
             monthlyAvailablePeriodLabel.text = nil
         }
 
-        // 비례
-        if let p = prorated {
-            totalProratedLabel.text = "비례연차 합계: \(p.totalLeaveDays)일"
-            proratedAccrualPeriodLabel.text = "비례연차 산정 기간: \(p.accrualPeriod.startDate) ~ \(p.accrualPeriod.endDate)"
-            proratedAvailablePeriodLabel.text = "비례연차 가용 기간: \(p.availablePeriod.startDate) ~ \(p.availablePeriod.endDate)"
+        // 2) 비례 섹션
+        if let prorated = proratedDetail {
+            totalProratedLabel.text = "비례연차 합계: \(prorated.totalLeaveDays)일"
+            proratedAccrualPeriodLabel.text = "비례연차 산정 기간: \(prorated.accrualPeriod.startDate) ~ \(prorated.accrualPeriod.endDate)"
+            proratedAvailablePeriodLabel.text = "비례연차 가용 기간: \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
             proratedSectionStack.isHidden = false
         } else {
             proratedSectionStack.isHidden = true
@@ -247,10 +268,12 @@ final class ResultViewController: BaseViewController {
             proratedAvailablePeriodLabel.text = nil
         }
 
-        // 하단 구분선: 둘 다 없으면 숨김
-        let hasAnySection = (monthly != nil) || (prorated != nil)
+        // 3) 하단 구분선: 월차/비례 둘 중 하나라도 있으면 표시
+        let hasAnySection = (monthlyDetail != nil) || (proratedDetail != nil) || (monthlyDetail == nil && proratedDetail == nil)
+        // 위 조건의 마지막 항은 "둘 다 없을 때 월차 섹션을 연차로 사용" 케이스를 반영
         infoSeparatorBottom.isHidden = !hasAnySection
     }
+
     
     // MARK: Layout
     private func setupLayout() {
