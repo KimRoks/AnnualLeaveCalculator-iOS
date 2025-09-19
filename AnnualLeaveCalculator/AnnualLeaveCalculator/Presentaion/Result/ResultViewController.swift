@@ -38,11 +38,7 @@ final class ResultViewController: BaseViewController {
         return label
     }()
     
-    private let resultSeparator: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(hex: "#F2F2F2")
-        return view
-    }()
+    private let resultSeparator: Separator = Separator()
     
     private let resultCardLabel: PaddedLabel = {
         let label = PaddedLabel(insets: .init(top: 6, left: 10, bottom: 6, right: 10))
@@ -87,11 +83,7 @@ final class ResultViewController: BaseViewController {
         return label
     }()
     
-    private let infoSeparator: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(hex: "#F2F2F2")
-        return view
-    }()
+    private let infoSeparator: Separator = Separator()
     
     private let infoDetailStack: UIStackView = {
         let v = UIStackView()
@@ -114,11 +106,7 @@ final class ResultViewController: BaseViewController {
         return v
     }()
     
-    private let infoSeparatorBottom: UIView = {
-        let v = UIView()
-        v.backgroundColor = UIColor(hex: "#F2F2F2")
-        return v
-    }()
+    private let infoSeparatorBottom: Separator = Separator()
     
     private let totalMonthlyLabel: UILabel = UILabel()
     private let monthlyAccrualPeriodLabel: UILabel = UILabel()
@@ -215,11 +203,7 @@ final class ResultViewController: BaseViewController {
             infoSeparatorBottom,
             totalLeaveDaysLabel
         )
-        
-        infoSeparatorBottom.snp.makeConstraints {
-            $0.height.equalTo(1)
-        }
-        
+            
         // infoSeparator 바로 아래에 배치
         infoDetailStack.snp.makeConstraints {
             $0.top.equalTo(infoSeparator.snp.bottom).offset(10)
@@ -325,7 +309,6 @@ final class ResultViewController: BaseViewController {
         resultSeparator.snp.makeConstraints {
             $0.top.equalTo(resultLabel.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(1)
         }
         
         resultDescriptionLabel.snp.makeConstraints {
@@ -367,7 +350,6 @@ final class ResultViewController: BaseViewController {
         infoSeparator.snp.makeConstraints {
             $0.top.equalTo(infoLabel.snp.bottom).offset(5)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(1)
         }
         
         // Detail card
