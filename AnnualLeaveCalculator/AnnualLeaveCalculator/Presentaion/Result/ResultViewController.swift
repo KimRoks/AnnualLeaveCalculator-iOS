@@ -38,11 +38,7 @@ final class ResultViewController: BaseViewController {
         return label
     }()
     
-    private let resultSeparator: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(hex: "#F2F2F2")
-        return view
-    }()
+    private let resultSeparator: Separator = Separator()
     
     private let resultCardLabel: PaddedLabel = {
         let label = PaddedLabel(insets: .init(top: 6, left: 10, bottom: 6, right: 10))
@@ -87,11 +83,7 @@ final class ResultViewController: BaseViewController {
         return label
     }()
     
-    private let infoSeparator: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIColor(hex: "#F2F2F2")
-        return view
-    }()
+    private let infoSeparator: Separator = Separator()
     
     private let infoDetailStack: UIStackView = {
         let v = UIStackView()
@@ -114,11 +106,7 @@ final class ResultViewController: BaseViewController {
         return v
     }()
     
-    private let infoSeparatorBottom: UIView = {
-        let v = UIView()
-        v.backgroundColor = UIColor(hex: "#F2F2F2")
-        return v
-    }()
+    private let infoSeparatorBottom: Separator = Separator()
     
     private let totalMonthlyLabel: UILabel = UILabel()
     private let monthlyAccrualPeriodLabel: UILabel = UILabel()
@@ -151,6 +139,10 @@ final class ResultViewController: BaseViewController {
         completeButton.addAction(UIAction { [weak self] _ in
             self?.completeButtonTapped()
         },for: .touchUpInside)
+        
+        detailButton.addAction(UIAction { [weak self]_ in
+            self?.pushToResultDetailVC()
+        }, for: .touchUpInside)
     }
     
     // MARK: init
@@ -215,11 +207,7 @@ final class ResultViewController: BaseViewController {
             infoSeparatorBottom,
             totalLeaveDaysLabel
         )
-        
-        infoSeparatorBottom.snp.makeConstraints {
-            $0.height.equalTo(1)
-        }
-        
+            
         // infoSeparator 바로 아래에 배치
         infoDetailStack.snp.makeConstraints {
             $0.top.equalTo(infoSeparator.snp.bottom).offset(10)
@@ -231,26 +219,47 @@ final class ResultViewController: BaseViewController {
     private func bindDetailSections(with result: CalculationResultDTO) {
         totalLeaveDaysLabel.text = "총 연차 합계: \(result.calculationDetail.totalLeaveDays)일"
 
-        let monthly = result.calculationDetail.monthlyDetail
-        let prorated = result.calculationDetail.proratedDetail
+        let calculationDetail = result.calculationDetail
+        let monthlyDetail = calculationDetail.monthlyDetail
+        let proratedDetail = calculationDetail.proratedDetail
 
-        if let m = monthly {
-            totalMonthlyLabel.text = "월차 합계: \(m.totalLeaveDays)일"
-            monthlyAccrualPeriodLabel.text = "월차 산정기간: \(m.accrualPeriod.startDate) ~ \(m.accrualPeriod.endDate)"
-            monthlyAvailablePeriodLabel.text = "월차 가용 기간: \(m.availablePeriod.startDate) ~ \(m.availablePeriod.endDate)"
+        // 1) 월별(월차) 섹션
+        if let monthly = monthlyDetail {
+            // 월차가 있으면 월차 기준으로 표기
+            totalMonthlyLabel.text = "월차 합계: \(monthly.totalLeaveDays)일"
+            monthlyAccrualPeriodLabel.text = "월차 산정기간: \(monthly.accrualPeriod.startDate) ~ \(monthly.accrualPeriod.endDate)"
+            monthlyAvailablePeriodLabel.text = "월차 가용 기간: \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
+            monthlySectionStack.isHidden = false
+        } else if monthlyDetail == nil && proratedDetail == nil {
+            // 둘 다 없으면 calculationDetail의 정보를 '연차'로 표기
+            totalMonthlyLabel.text = "연차 합계: \(calculationDetail.totalLeaveDays)일"
+
+            if let accrual = calculationDetail.accrualPeriod {
+                monthlyAccrualPeriodLabel.text = "연차 산정기간: \(accrual.startDate) ~ \(accrual.endDate)"
+            } else {
+                monthlyAccrualPeriodLabel.text = "연차 산정기간: -"
+            }
+
+            if let available = calculationDetail.availablePeriod {
+                monthlyAvailablePeriodLabel.text = "연차 가용 기간: \(available.startDate) ~ \(available.endDate)"
+            } else {
+                monthlyAvailablePeriodLabel.text = "연차 가용 기간: -"
+            }
+
             monthlySectionStack.isHidden = false
         } else {
+            // 월차가 없고, 비례만 있는 경우 등
             monthlySectionStack.isHidden = true
             totalMonthlyLabel.text = nil
             monthlyAccrualPeriodLabel.text = nil
             monthlyAvailablePeriodLabel.text = nil
         }
 
-        // 비례
-        if let p = prorated {
-            totalProratedLabel.text = "비례연차 합계: \(p.totalLeaveDays)일"
-            proratedAccrualPeriodLabel.text = "비례연차 산정 기간: \(p.accrualPeriod.startDate) ~ \(p.accrualPeriod.endDate)"
-            proratedAvailablePeriodLabel.text = "비례연차 가용 기간: \(p.availablePeriod.startDate) ~ \(p.availablePeriod.endDate)"
+        // 2) 비례 섹션
+        if let prorated = proratedDetail {
+            totalProratedLabel.text = "비례연차 합계: \(prorated.totalLeaveDays)일"
+            proratedAccrualPeriodLabel.text = "비례연차 산정 기간: \(prorated.accrualPeriod.startDate) ~ \(prorated.accrualPeriod.endDate)"
+            proratedAvailablePeriodLabel.text = "비례연차 가용 기간: \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
             proratedSectionStack.isHidden = false
         } else {
             proratedSectionStack.isHidden = true
@@ -259,10 +268,12 @@ final class ResultViewController: BaseViewController {
             proratedAvailablePeriodLabel.text = nil
         }
 
-        // 하단 구분선: 둘 다 없으면 숨김
-        let hasAnySection = (monthly != nil) || (prorated != nil)
+        // 3) 하단 구분선: 월차/비례 둘 중 하나라도 있으면 표시
+        let hasAnySection = (monthlyDetail != nil) || (proratedDetail != nil) || (monthlyDetail == nil && proratedDetail == nil)
+        // 위 조건의 마지막 항은 "둘 다 없을 때 월차 섹션을 연차로 사용" 케이스를 반영
         infoSeparatorBottom.isHidden = !hasAnySection
     }
+
     
     // MARK: Layout
     private func setupLayout() {
@@ -325,7 +336,6 @@ final class ResultViewController: BaseViewController {
         resultSeparator.snp.makeConstraints {
             $0.top.equalTo(resultLabel.snp.bottom).offset(10)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(1)
         }
         
         resultDescriptionLabel.snp.makeConstraints {
@@ -367,7 +377,6 @@ final class ResultViewController: BaseViewController {
         infoSeparator.snp.makeConstraints {
             $0.top.equalTo(infoLabel.snp.bottom).offset(5)
             $0.leading.trailing.equalToSuperview().inset(20)
-            $0.height.equalTo(1)
         }
         
         // Detail card
@@ -442,9 +451,12 @@ final class ResultViewController: BaseViewController {
         
         let periodText: String = {
             if let period = result.calculationDetail.availablePeriod {
-                return "연차 가용 기간:  \(period.startDate) ~ \(period.endDate)"
+                return "가용 기간:  \(period.startDate) ~ \(period.endDate)"
             } else {
-                return "사용 가능 기간:  -"
+                guard let monthlyPeriod = result.calculationDetail.monthlyDetail?.accrualPeriod else {
+                    return "가용 기간 -"
+                }
+                return "월차 가용 기간:  \(monthlyPeriod.startDate) ~ \(monthlyPeriod.endDate)"
             }
         }()
         
@@ -508,5 +520,10 @@ final class ResultViewController: BaseViewController {
         }
         att.append(NSAttributedString(string: periodText, attributes: [.font: font, .foregroundColor: color]))
         proratedAvailablePeriodBadgeLabel.attributedText = att
+    }
+    
+    private func pushToResultDetailVC() {
+        let resultDetailVC = ResultDetailViewController(result: result)
+        self.navigationController?.pushViewController(resultDetailVC, animated: true)
     }
 }

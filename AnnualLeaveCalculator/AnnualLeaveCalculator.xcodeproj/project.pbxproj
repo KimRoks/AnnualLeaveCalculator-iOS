@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		D7E5C1612E49D39F00128699 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D7E5C1602E49D39F00128699 /* SnapKit */; };
-		D7E5C1642E49D3B900128699 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = D7E5C1632E49D3B900128699 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,7 +41,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D7E5C1612E49D39F00128699 /* SnapKit in Frameworks */,
-				D7E5C1642E49D3B900128699 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,7 +84,6 @@
 			name = AnnualLeaveCalculator;
 			packageProductDependencies = (
 				D7E5C1602E49D39F00128699 /* SnapKit */,
-				D7E5C1632E49D3B900128699 /* Alamofire */,
 			);
 			productName = AnnualLeaveCalculator;
 			productReference = D7E5C0F72E498AA500128699 /* AnnualLeaveCalculator.app */;
@@ -118,7 +115,6 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				D7E5C15F2E49D39F00128699 /* XCRemoteSwiftPackageReference "SnapKit" */,
-				D7E5C1622E49D3B900128699 /* XCRemoteSwiftPackageReference "Alamofire" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D7E5C0F82E498AA500128699 /* Products */;
@@ -370,14 +366,6 @@
 				minimumVersion = 5.0.1;
 			};
 		};
-		D7E5C1622E49D3B900128699 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 5.10.0;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -385,11 +373,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D7E5C15F2E49D39F00128699 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
-		};
-		D7E5C1632E49D3B900128699 /* Alamofire */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D7E5C1622E49D3B900128699 /* XCRemoteSwiftPackageReference "Alamofire" */;
-			productName = Alamofire;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
