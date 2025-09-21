@@ -8,6 +8,7 @@
 import Foundation
 
 public struct CalculationResultDTO: Decodable {
+    public let calculationId: String
     public let calculationType: String
     public let fiscalYear: String?
     public let hireDate: String
@@ -20,6 +21,7 @@ public struct CalculationResultDTO: Decodable {
     public let nonWorkingExplanations: [String]?
     
     public enum CodingKeys: String, CodingKey {
+        case calculationId
         case calculationType
         case fiscalYear
         case hireDate
