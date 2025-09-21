@@ -36,7 +36,11 @@ extension AnnualLeaveTarget: TargetType {
     var headers: [String : String]? {
         switch self {
         case .calculate:
-            return ["Content-Type": "application/json"]
+            return [
+                "Content-Type": "application/json",
+                "X-Platform": "ios",
+                "X-Test": "true"
+            ]
         }
     }
     
