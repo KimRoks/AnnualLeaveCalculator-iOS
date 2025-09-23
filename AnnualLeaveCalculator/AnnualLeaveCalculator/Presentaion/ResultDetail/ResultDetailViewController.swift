@@ -72,6 +72,7 @@ final class ResultDetailViewController: BaseViewController {
         stackView.spacing = 8
         return stackView
     }()
+    private let recordsSeparatorBotton: Separator = Separator()
     private let recordsTotalLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(style: .bold, size: 14)
@@ -195,6 +196,7 @@ final class ResultDetailViewController: BaseViewController {
             recordsTitleLabel,
             recordsSeparator,
             recordsListStack,
+            recordsSeparatorBotton,
             recordsTotalLabel
         )
         
@@ -263,8 +265,14 @@ final class ResultDetailViewController: BaseViewController {
             $0.top.equalTo(recordsSeparator.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
+        
+        recordsSeparatorBotton.snp.makeConstraints {
+            $0.top.equalTo(recordsListStack.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
         recordsTotalLabel.snp.makeConstraints {
-            $0.top.equalTo(recordsListStack.snp.bottom).offset(12)
+            $0.top.equalTo(recordsSeparatorBotton.snp.bottom).offset(10)
             $0.leading.equalToSuperview().offset(20)
             $0.bottom.equalToSuperview().inset(20)
         }
@@ -568,7 +576,7 @@ final class ResultDetailViewController: BaseViewController {
             let label = UILabel()
             label.numberOfLines = 0
             label.font = .pretendard(style: .regular, size: 13)
-            label.textColor = .secondaryLabel
+            label.textColor = .label
             label.text = "• \(text)"
             stack.addArrangedSubview(label)
         }
