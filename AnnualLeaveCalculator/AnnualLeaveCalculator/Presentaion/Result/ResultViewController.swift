@@ -227,23 +227,23 @@ final class ResultViewController: BaseViewController {
         if let monthly = monthlyDetail {
             // 월차가 있으면 월차 기준으로 표기
             totalMonthlyLabel.text = "월차 합계: \(monthly.totalLeaveDays)일"
-            monthlyAccrualPeriodLabel.text = "월차 산정기간: \(monthly.accrualPeriod.startDate) ~ \(monthly.accrualPeriod.endDate)"
-            monthlyAvailablePeriodLabel.text = "월차 가용 기간: \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
+            monthlyAccrualPeriodLabel.text = "월차 산정 기간: \(monthly.accrualPeriod.startDate) ~ \(monthly.accrualPeriod.endDate)"
+            monthlyAvailablePeriodLabel.text = "월차 사용 기간: \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
             monthlySectionStack.isHidden = false
         } else if monthlyDetail == nil && proratedDetail == nil {
             // 둘 다 없으면 calculationDetail의 정보를 '연차'로 표기
             totalMonthlyLabel.text = "연차 합계: \(calculationDetail.totalLeaveDays)일"
 
             if let accrual = calculationDetail.accrualPeriod {
-                monthlyAccrualPeriodLabel.text = "연차 산정기간: \(accrual.startDate) ~ \(accrual.endDate)"
+                monthlyAccrualPeriodLabel.text = "연차 산정 기간: \(accrual.startDate) ~ \(accrual.endDate)"
             } else {
-                monthlyAccrualPeriodLabel.text = "연차 산정기간: -"
+                monthlyAccrualPeriodLabel.text = "연차 산정 기간: -"
             }
 
             if let available = calculationDetail.availablePeriod {
-                monthlyAvailablePeriodLabel.text = "연차 가용 기간: \(available.startDate) ~ \(available.endDate)"
+                monthlyAvailablePeriodLabel.text = "연차 사용 기간: \(available.startDate) ~ \(available.endDate)"
             } else {
-                monthlyAvailablePeriodLabel.text = "연차 가용 기간: -"
+                monthlyAvailablePeriodLabel.text = "연차 사용 기간: -"
             }
 
             monthlySectionStack.isHidden = false
@@ -259,7 +259,7 @@ final class ResultViewController: BaseViewController {
         if let prorated = proratedDetail {
             totalProratedLabel.text = "비례연차 합계: \(prorated.totalLeaveDays)일"
             proratedAccrualPeriodLabel.text = "비례연차 산정 기간: \(prorated.accrualPeriod.startDate) ~ \(prorated.accrualPeriod.endDate)"
-            proratedAvailablePeriodLabel.text = "비례연차 가용 기간: \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
+            proratedAvailablePeriodLabel.text = "비례연차 사용 기간: \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
             proratedSectionStack.isHidden = false
         } else {
             proratedSectionStack.isHidden = true
@@ -451,12 +451,12 @@ final class ResultViewController: BaseViewController {
         
         let periodText: String = {
             if let period = result.calculationDetail.availablePeriod {
-                return "가용 기간:  \(period.startDate) ~ \(period.endDate)"
+                return "사용 기간:  \(period.startDate) ~ \(period.endDate)"
             } else {
                 guard let monthlyPeriod = result.calculationDetail.monthlyDetail?.accrualPeriod else {
-                    return "가용 기간 -"
+                    return "사용 기간 -"
                 }
-                return "월차 가용 기간:  \(monthlyPeriod.startDate) ~ \(monthlyPeriod.endDate)"
+                return "월차 사용 기간:  \(monthlyPeriod.startDate) ~ \(monthlyPeriod.endDate)"
             }
         }()
         
@@ -503,7 +503,7 @@ final class ResultViewController: BaseViewController {
         
         let font = proratedAvailablePeriodBadgeLabel.font ?? .systemFont(ofSize: 10)
         let color = proratedAvailablePeriodBadgeLabel.textColor ?? .label
-        let periodText = "비례 연차 가용 기간:  \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
+        let periodText = "비례 연차 사용 기간:  \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
         
         let symConfig = UIImage.SymbolConfiguration(pointSize: font.pointSize, weight: .medium)
         let symbol = UIImage(systemName: "calendar", withConfiguration: symConfig)?

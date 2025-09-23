@@ -351,7 +351,7 @@ final class ResultDetailViewController: BaseViewController {
             if let monthly = result.calculationDetail.monthlyDetail {
                 // 라벨
                 accrualPeriodLabel.text = "연차 산정 기간:  \(monthly.accrualPeriod.startDate) ~ \(monthly.accrualPeriod.endDate)"
-                availablePeriodLabel.text = "연차 가용 기간:  \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
+                availablePeriodLabel.text = "연차 사용 기간:  \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
                 totalLeaveDaysLabel.text = "연차 합계:  \(formatNumber(monthly.totalLeaveDays))일"
                 
                 // 월차 탭에서는 출근율/소정근로비율 감춤 (월차에는 해당 값 없음)
@@ -361,7 +361,7 @@ final class ResultDetailViewController: BaseViewController {
                 prescribedWorkingRatioLabel.isHidden = true
             } else {
                 accrualPeriodLabel.text = "월차 산정 기간:  -"
-                availablePeriodLabel.text = "월차 가용 기간:  -"
+                availablePeriodLabel.text = "월차 사용 기간:  -"
                 totalLeaveDaysLabel.text = "월차 합계:  -"
                 attendanceRateLabel.isHidden = true
                 prescribedWorkingRatioLabel.isHidden = true
@@ -377,7 +377,7 @@ final class ResultDetailViewController: BaseViewController {
         case .prorated:
             if let prorated = result.calculationDetail.proratedDetail {
                 accrualPeriodLabel.text = "비례연차 산정 기간:  \(prorated.accrualPeriod.startDate) ~ \(prorated.accrualPeriod.endDate)"
-                availablePeriodLabel.text = "비례연차 가용 기간:  \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
+                availablePeriodLabel.text = "비례연차 사용 기간:  \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
                 totalLeaveDaysLabel.text = "비례연차 합계:  \(formatNumber(prorated.totalLeaveDays))일"
                 
                 // 비례 값 표시
@@ -397,7 +397,7 @@ final class ResultDetailViewController: BaseViewController {
                 }
             } else {
                 accrualPeriodLabel.text = "비례연차 산정 기간:  -"
-                availablePeriodLabel.text = "비례연차 가용 기간:  -"
+                availablePeriodLabel.text = "비례연차 사용 기간:  -"
                 totalLeaveDaysLabel.text = "비례연차 합계:  -"
                 attendanceRateLabel.text = "출근율:  -"
                 prescribedWorkingRatioLabel.text = "소정근로비율:  -"
@@ -437,9 +437,9 @@ final class ResultDetailViewController: BaseViewController {
         }
         
         if let availablePeriod = detail.availablePeriod {
-            availablePeriodLabel.text = "연차 가용 기간:  \(availablePeriod.startDate) ~ \(availablePeriod.endDate)"
+            availablePeriodLabel.text = "연차 사용 기간:  \(availablePeriod.startDate) ~ \(availablePeriod.endDate)"
         } else {
-            availablePeriodLabel.text = "연차 가용 기간:  -"
+            availablePeriodLabel.text = "연차 사용 기간:  -"
         }
         
         serviceYearsLabel.text = "근속연수:  \(detail.serviceYears)년"

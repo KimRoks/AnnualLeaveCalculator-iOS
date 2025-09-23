@@ -35,7 +35,7 @@ extension NonWorkingType {
         case .maternityLeave: return "출산전후휴가"
         case .miscarriageStillbirth: return "유사산휴가"
         case .reserveForcesTraining: return "예비군훈련"
-        case .industrialAccident: return "산재기간"
+        case .industrialAccident: return "산재 기간"
         case .civicDuty: return "공민권 행사일"
         case .spouseMaternityLeave: return "출산휴가"
         case .familyCareLeave: return "가족돌봄휴가"
