@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 
 final class ResultDetailViewController: BaseViewController {
+    override var navigationTitle: String { "상세보기" }
     private let result: CalculationResultDTO
     
     // MARK: - Segmented
@@ -72,6 +73,7 @@ final class ResultDetailViewController: BaseViewController {
         stackView.spacing = 8
         return stackView
     }()
+    private let recordsSeparatorBotton: Separator = Separator()
     private let recordsTotalLabel: UILabel = {
         let label = UILabel()
         label.font = .pretendard(style: .bold, size: 14)
@@ -195,6 +197,7 @@ final class ResultDetailViewController: BaseViewController {
             recordsTitleLabel,
             recordsSeparator,
             recordsListStack,
+            recordsSeparatorBotton,
             recordsTotalLabel
         )
         
@@ -263,8 +266,14 @@ final class ResultDetailViewController: BaseViewController {
             $0.top.equalTo(recordsSeparator.snp.bottom).offset(12)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
+        
+        recordsSeparatorBotton.snp.makeConstraints {
+            $0.top.equalTo(recordsListStack.snp.bottom).offset(10)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
         recordsTotalLabel.snp.makeConstraints {
-            $0.top.equalTo(recordsListStack.snp.bottom).offset(12)
+            $0.top.equalTo(recordsSeparatorBotton.snp.bottom).offset(10)
             $0.leading.equalToSuperview().offset(20)
             $0.bottom.equalToSuperview().inset(20)
         }
@@ -351,7 +360,7 @@ final class ResultDetailViewController: BaseViewController {
             if let monthly = result.calculationDetail.monthlyDetail {
                 // 라벨
                 accrualPeriodLabel.text = "연차 산정 기간:  \(monthly.accrualPeriod.startDate) ~ \(monthly.accrualPeriod.endDate)"
-                availablePeriodLabel.text = "연차 가용 기간:  \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
+                availablePeriodLabel.text = "연차 사용 기간:  \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
                 totalLeaveDaysLabel.text = "연차 합계:  \(formatNumber(monthly.totalLeaveDays))일"
                 
                 // 월차 탭에서는 출근율/소정근로비율 감춤 (월차에는 해당 값 없음)
@@ -361,7 +370,7 @@ final class ResultDetailViewController: BaseViewController {
                 prescribedWorkingRatioLabel.isHidden = true
             } else {
                 accrualPeriodLabel.text = "월차 산정 기간:  -"
-                availablePeriodLabel.text = "월차 가용 기간:  -"
+                availablePeriodLabel.text = "월차 사용 기간:  -"
                 totalLeaveDaysLabel.text = "월차 합계:  -"
                 attendanceRateLabel.isHidden = true
                 prescribedWorkingRatioLabel.isHidden = true
@@ -377,7 +386,7 @@ final class ResultDetailViewController: BaseViewController {
         case .prorated:
             if let prorated = result.calculationDetail.proratedDetail {
                 accrualPeriodLabel.text = "비례연차 산정 기간:  \(prorated.accrualPeriod.startDate) ~ \(prorated.accrualPeriod.endDate)"
-                availablePeriodLabel.text = "비례연차 가용 기간:  \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
+                availablePeriodLabel.text = "비례연차 사용 기간:  \(prorated.availablePeriod.startDate) ~ \(prorated.availablePeriod.endDate)"
                 totalLeaveDaysLabel.text = "비례연차 합계:  \(formatNumber(prorated.totalLeaveDays))일"
                 
                 // 비례 값 표시
@@ -397,7 +406,7 @@ final class ResultDetailViewController: BaseViewController {
                 }
             } else {
                 accrualPeriodLabel.text = "비례연차 산정 기간:  -"
-                availablePeriodLabel.text = "비례연차 가용 기간:  -"
+                availablePeriodLabel.text = "비례연차 사용 기간:  -"
                 totalLeaveDaysLabel.text = "비례연차 합계:  -"
                 attendanceRateLabel.text = "출근율:  -"
                 prescribedWorkingRatioLabel.text = "소정근로비율:  -"
@@ -437,9 +446,9 @@ final class ResultDetailViewController: BaseViewController {
         }
         
         if let availablePeriod = detail.availablePeriod {
-            availablePeriodLabel.text = "연차 가용 기간:  \(availablePeriod.startDate) ~ \(availablePeriod.endDate)"
+            availablePeriodLabel.text = "연차 사용 기간:  \(availablePeriod.startDate) ~ \(availablePeriod.endDate)"
         } else {
-            availablePeriodLabel.text = "연차 가용 기간:  -"
+            availablePeriodLabel.text = "연차 사용 기간:  -"
         }
         
         serviceYearsLabel.text = "근속연수:  \(detail.serviceYears)년"
@@ -568,7 +577,7 @@ final class ResultDetailViewController: BaseViewController {
             let label = UILabel()
             label.numberOfLines = 0
             label.font = .pretendard(style: .regular, size: 13)
-            label.textColor = .secondaryLabel
+            label.textColor = .label
             label.text = "• \(text)"
             stack.addArrangedSubview(label)
         }

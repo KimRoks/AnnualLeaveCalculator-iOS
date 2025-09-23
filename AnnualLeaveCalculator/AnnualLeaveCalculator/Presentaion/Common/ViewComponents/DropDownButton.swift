@@ -35,7 +35,7 @@ extension NonWorkingType {
         case .maternityLeave: return "출산전후휴가"
         case .miscarriageStillbirth: return "유사산휴가"
         case .reserveForcesTraining: return "예비군훈련"
-        case .industrialAccident: return "산재기간"
+        case .industrialAccident: return "산재 기간"
         case .civicDuty: return "공민권 행사일"
         case .spouseMaternityLeave: return "출산휴가"
         case .familyCareLeave: return "가족돌봄휴가"
@@ -50,13 +50,14 @@ extension NonWorkingType {
             return "일반휴직(개인사유)"
         }
     }
-
+    
     static func from(title: String) -> NonWorkingType? {
         Self.allCases.first { $0.displayTitle == title }
     }
+    
     var serverCode: Int {
-           switch self {
-           case .parentalLeave,
+        switch self {
+        case .parentalLeave,
                 .maternityLeave,
                 .miscarriageStillbirth,
                 .reserveForcesTraining,
@@ -66,19 +67,19 @@ extension NonWorkingType {
                 .familyCareLeave,
                 .unfairDismissal,
                 .illegalLockout:
-               return 1
-
-           case .unauthorizedAbsence,
+            return 1
+            
+        case .unauthorizedAbsence,
                 .disciplinarySuspension,
                 .illegalStrike:
-               return 2
-
-           case .militaryServiceLeave,
+            return 2
+            
+        case .militaryServiceLeave,
                 .personalIllnessLeave,
                 .personalReasonLeave:
-               return 3
-           }
-       }
+            return 3
+        }
+    }
 }
 
 enum CompanyHolidayType: CaseIterable, Hashable {
@@ -89,7 +90,7 @@ enum CompanyHolidayType: CaseIterable, Hashable {
     case companyWideSummerBreak                     // 일괄 여름휴가 지정일(단체 연차사용 제외)
     case discretionaryPrePostHoliday                // 명절 전후 임의휴무일(단체 연차사용 제외)
     case other                                      // 기타
-
+    
     var title: String {
         switch self {
         case .companyFoundationDay:        return "회사 창립기념일"
@@ -105,85 +106,80 @@ enum CompanyHolidayType: CaseIterable, Hashable {
 
 // MARK: - 재사용 가능한 드롭다운 버튼
 final class DropDownButton: UIButton {
-
+    
     // 외부에서 고르는 데이터 소스 종류
     enum Kind: Equatable {
         case nonWorkingTypes
         case holidaysTypes
     }
-
+    
     // 내부 표현
     struct Item: Hashable {
         let id: AnyHashable
         let title: String
     }
-
+    
     // MARK: Public 상태/콜백(하위 호환 유지)
     private(set) var selectedItem: String?
     private(set) var selectedType: NonWorkingType?
     var selectedTypeId: Int? { selectedType?.serverCode }
     private(set) var selectedId: AnyHashable?
-
+    
     var onItemSelected: ((String) -> Void)?
     var onItemSelectedType: ((String, NonWorkingType) -> Void)?
     var onSelect: ((Item) -> Void)?
-
+    
     // 사용자 지정 가능 속성
     var maxHeightFraction: CGFloat = 0.4
     var rowHeight: CGFloat = 48
     var minPopoverWidth: CGFloat = 230
     var cellNumberOfLines: Int = 1
     var placeholder: String = "선택"
-
+    
     // MARK: Private
     private var kind: Kind
     private var items: [Item] = []
-
+    
     // MARK: Init
     init(
-        kind: Kind = .nonWorkingTypes,
+        kind: Kind = .nonWorkingTypes
     ) {
         self.kind = kind
         super.init(frame: .zero)
         setupButton()
         reloadItemsFromKind()
-        rebuildMenu()
         applyTitleIfNeeded()
-        showsMenuAsPrimaryAction = false
         addTarget(self, action: #selector(didTap), for: .touchUpInside)
     }
-
+    
     required init?(coder: NSCoder) {
         self.kind = .nonWorkingTypes
         super.init(coder: coder)
         setupButton()
         reloadItemsFromKind()
-        rebuildMenu()
         applyTitleIfNeeded()
-        showsMenuAsPrimaryAction = false
         addTarget(self, action: #selector(didTap), for: .touchUpInside)
     }
-
+    
     func preselect(title: String) {
         if let found = items.first(where: { $0.title == title }) {
             applySelection(item: found)
         }
     }
-
+    
     func preselect(type: NonWorkingType) {
         if let found = items.first(where: { ($0.id as? NonWorkingType) == type }) {
             applySelection(item: found)
         }
     }
-
+    
     func reset() {
         selectedItem = nil
         selectedType = nil
         selectedId = nil
         applyTitle(placeholder)
-        rebuildMenu()
     }
-
+    
     // MARK: UI
     private func setupButton() {
         var configuration = UIButton.Configuration.filled()
@@ -191,60 +187,48 @@ final class DropDownButton: UIButton {
         configuration.baseForegroundColor = .black
         configuration.cornerStyle = .medium
         configuration.titleLineBreakMode = .byTruncatingTail
-
+        
         let symbolConfiguration = UIImage.SymbolConfiguration(pointSize: 12, weight: .medium)
         configuration.image = UIImage(systemName: "chevron.down", withConfiguration: symbolConfiguration)
         configuration.imagePlacement = .trailing
         configuration.imagePadding = 6
-
+        
         configuration.attributedTitle = AttributedString(placeholder, attributes: AttributeContainer([
             .font: UIFont.pretendard(style: .medium, size: 14)
         ]))
         configuration.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
         self.configuration = configuration
     }
-
+    
     private func reloadItemsFromKind() {
         switch kind {
         case .nonWorkingTypes:
             items = NonWorkingType.allCases.map { Item(id: $0, title: $0.displayTitle) }
             
         case .holidaysTypes:
-            items = CompanyHolidayType.allCases.map { Item(id: $0, title: $0.title)
-            }
-            
+            items = CompanyHolidayType.allCases.map { Item(id: $0, title: $0.title) }
             isEnabled = !items.isEmpty
         }
     }
-
-    private func rebuildMenu() {
-        let actions = items.map { item in
-            UIAction(title: item.title, state: item.title == selectedItem ? .on : .off) { [weak self] _ in
-                self?.applySelection(item: item)
-            }
-        }
-        menu = UIMenu(options: .displayInline, children: actions)
-    }
-
+    
     private func applySelection(item: Item) {
         selectedItem = item.title
         selectedId = item.id
         selectedType = (item.id as? NonWorkingType)
-
+        
         applyTitle(item.title)
-        rebuildMenu()
-
+        
         onSelect?(item)
         onItemSelected?(item.title)
         if let type = selectedType {
             onItemSelectedType?(item.title, type)
         }
     }
-
+    
     private func applyTitleIfNeeded() {
         applyTitle(selectedItem ?? placeholder)
     }
-
+    
     private func applyTitle(_ title: String) {
         guard var buttonConfiguration = configuration else { return }
         buttonConfiguration.attributedTitle = AttributedString(title, attributes: AttributeContainer([
@@ -252,11 +236,11 @@ final class DropDownButton: UIButton {
         ]))
         configuration = buttonConfiguration
     }
-
+    
     // MARK: Actions
     @objc private func didTap() {
         guard let parentViewController = parentViewController else { return }
-
+        
         let popoverController = DropdownPopoverController(
             items: items,
             selectedTitle: selectedItem,
@@ -266,7 +250,7 @@ final class DropDownButton: UIButton {
         popoverController.onSelect = { [weak self] item in
             self?.applySelection(item: item)
         }
-
+        
         popoverController.modalPresentationStyle = .popover
         if let pop = popoverController.popoverPresentationController {
             pop.sourceView = self
@@ -274,15 +258,15 @@ final class DropDownButton: UIButton {
             pop.permittedArrowDirections = [.up, .down]
             pop.delegate = popoverController
         }
-
+        
         let screenHeight = UIScreen.main.bounds.height
         let maxHeight = screenHeight * maxHeightFraction
         let totalHeight = CGFloat(items.count) * rowHeight
         let finalHeight = min(maxHeight, totalHeight)
-
+        
         let width = max(bounds.width, minPopoverWidth)
         popoverController.preferredContentSize = CGSize(width: width, height: finalHeight)
-
+        
         parentViewController.present(popoverController, animated: true)
     }
 }
@@ -290,14 +274,14 @@ final class DropDownButton: UIButton {
 // MARK: - 팝오버 컨트롤러
 private final class DropdownPopoverController: UIViewController {
     var onSelect: ((DropDownButton.Item) -> Void)?
-
+    
     private let items: [DropDownButton.Item]
     private let selectedTitle: String?
     private let rowHeight: CGFloat
     private let cellNumberOfLines: Int
-
+    
     private let tableView = UITableView(frame: .zero, style: .plain)
-
+    
     init(items: [DropDownButton.Item], selectedTitle: String?, rowHeight: CGFloat, cellNumberOfLines: Int) {
         self.items = items
         self.selectedTitle = selectedTitle
@@ -306,11 +290,11 @@ private final class DropdownPopoverController: UIViewController {
         super.init(nibName: nil, bundle: nil)
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-
+        
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.dataSource = self
         tableView.delegate = self
@@ -318,7 +302,7 @@ private final class DropdownPopoverController: UIViewController {
         tableView.tableFooterView = UIView()
         tableView.alwaysBounceVertical = true
         tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-
+        
         view.addSubview(tableView)
         tableView.snp.makeConstraints { $0.edges.equalToSuperview() }
     }
@@ -326,8 +310,10 @@ private final class DropdownPopoverController: UIViewController {
 
 // MARK: - UIPopoverPresentationControllerDelegate
 extension DropdownPopoverController: UIPopoverPresentationControllerDelegate {
-    func adaptivePresentationStyle(for controller: UIPresentationController,
-                                   traitCollection: UITraitCollection) -> UIModalPresentationStyle {
+    func adaptivePresentationStyle(
+        for controller: UIPresentationController,
+        traitCollection: UITraitCollection
+    ) -> UIModalPresentationStyle {
         .none
     }
 }
@@ -335,7 +321,7 @@ extension DropdownPopoverController: UIPopoverPresentationControllerDelegate {
 // MARK: - UITableViewDataSource
 extension DropdownPopoverController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { items.count }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let item = items[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
@@ -356,3 +342,4 @@ extension DropdownPopoverController: UITableViewDelegate {
         dismiss(animated: true)
     }
 }
+

@@ -1,140 +1,150 @@
-//
-//  InfoViewContoller.swift
+//  InfoViewController.swift
 //  AnnualLeaveCalculator
 //
-//  Created by 김경록 on 9/5/25.
+//  Created by 김경록 on 9/23/25.
+//
+//
+//  InfoViewController.swift
+//  AnnualLeaveCalculator
+//
+//  Created by 김경록 on 9/xx/25.
 //
 
 import UIKit
+import WebKit
+import SnapKit
+// TODO: 당장은 웹뷰로 처리, 추후 개선
 
 final class InfoViewController: BaseViewController {
-    private struct InfoItem {
-        let title: String
-        let showsChevron: Bool
-    }
-    // 데이터 소스 (필요 시 showsChevron를 항목별로 조정)
-    private let items: [InfoItem] = [
-        .init(title: "공지사항", showsChevron: true),
-        .init(title: "연차 산정 기준", showsChevron: true),
-        .init(title: "이용 약관", showsChevron: false)
-    ]
+        override var navigationTitle: String? { "개인정보처리방침" }
 
-    private let tableView: UITableView = {
-        let tv = UITableView(frame: .zero, style: .insetGrouped)
-        tv.backgroundColor = UIColor(hex: "#FDFDFD")
-
-        tv.separatorInset = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
-        tv.rowHeight = UITableView.automaticDimension
-        tv.estimatedRowHeight = 56
-        tv.keyboardDismissMode = .onDrag
-        tv.isScrollEnabled = false
-        return tv
+    private let defaultURLString = "https://maze-palladium-edf.notion.site/Privacy-Policy-273c4b24d2e28067945efab9f6942308?source=copy_link"
+    
+    private let webView: WKWebView = {
+        let config = WKWebViewConfiguration()
+        config.allowsInlineMediaPlayback = true
+        let wv = WKWebView(frame: .zero, configuration: config)
+        wv.allowsBackForwardNavigationGestures = true
+        return wv
     }()
-
+    
+    private let progressView: UIProgressView = {
+        let pv = UIProgressView(progressViewStyle: .bar)
+        pv.isHidden = true
+        return pv
+    }()
+    
+    private var progressObservation: NSKeyValueObservation?
+    private var titleObservation: NSKeyValueObservation?
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupTableView()
-        setupLayout()
+        setupViews()
         setupConstraints()
+        setupObservers()
+        loadIfPossible()
     }
-
-    // MARK: - Setup
-    private func setupTableView() {
-        tableView.register(InfoCell.self, forCellReuseIdentifier: InfoCell.reuseIdentifier)
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.tableFooterView = UIView()
-    }
-
-    private func setupLayout() {
-        view.addSubview(tableView)
-    }
-
-    private func setupConstraints() {
-        tableView.snp.makeConstraints {
-            $0.edges.equalTo(view)
-        }
-    }
-}
-
-// MARK: - UITableViewDataSource / UITableViewDelegate
-extension InfoViewController: UITableViewDataSource, UITableViewDelegate {
-    func numberOfSections(in tableView: UITableView) -> Int { 1 }
-
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        items.count
-    }
-
-    func tableView(_ tableView: UITableView,
-                   cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(
-            withIdentifier: InfoCell.reuseIdentifier,
-            for: indexPath
-        ) as? InfoCell else { return UITableViewCell() }
-
-        let item = items[indexPath.row]
-        cell.configure(title: item.title, showsChevron: item.showsChevron)
-        return cell
-    }
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-
-        let item = items[indexPath.row]
-        // 여기에 실제 화면 전환/액션을 연결하세요.
-        // 예시:
-        switch item.title {
-        case "공지사항":
-            // navigationController?.pushViewController(NoticeListViewController(), animated: true)
-            print("공지사항 tapped")
-        case "연차 산정 기준":
-            // navigationController?.pushViewController(AnnualRuleViewController(), animated: true)
-            print("연차 산정 기준 tapped")
-        case "이용 약관":
-            // showsChevron=false 이더라도 탭 액션을 막을 필요는 없음. 필요시 early return
-            print("이용 약관 tapped")
-        default:
-            break
-        }
-    }
-}
-
-
-// MARK: - Cell
-final class InfoCell: UITableViewCell,Reusable {
-    private let titleLabel: UILabel = {
-        let lb = UILabel()
-        lb.font = .pretendard(style: .medium, size: 16)
-        lb.textColor = .label
-        lb.numberOfLines = 1
-        return lb
-    }()
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        selectionStyle = .default
-        contentView.addSubviews(titleLabel)
-        contentView.backgroundColor = .white
-        titleLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(14)
-            $0.bottom.equalToSuperview().inset(14)
-            $0.leading.equalToSuperview().offset(20)
+    deinit {
+        progressObservation = nil
+        titleObservation = nil
+        webView.stopLoading()
+        webView.navigationDelegate = nil
+        webView.uiDelegate = nil
+    }
+    
+    // MARK: - Setup
+    private func setupViews() {
+        view.addSubview(webView)
+        view.addSubview(progressView)
+        webView.navigationDelegate = self
+        webView.uiDelegate = self
+        
+        // 필요하면 우측 상단에 새로고침 버튼 추가
+        let refreshItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refreshTapped))
+        navigationItem.rightBarButtonItem = refreshItem
+    }
+    
+    private func setupConstraints() {
+        progressView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide.snp.top)
+            $0.leading.trailing.equalTo(view)
+            $0.height.equalTo(2)
+        }
+        webView.snp.makeConstraints {
+            $0.top.equalTo(progressView.snp.bottom)
+            $0.leading.trailing.bottom.equalTo(view)
         }
     }
-
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        titleLabel.text = nil
-        accessoryType = .none
+    
+    private func setupObservers() {
+        progressObservation = webView.observe(\.estimatedProgress, options: [.new]) { [weak self] webView, _ in
+            guard let self = self else { return }
+            self.progressView.isHidden = webView.estimatedProgress >= 1.0
+            self.progressView.setProgress(Float(webView.estimatedProgress), animated: true)
+            if webView.estimatedProgress >= 1.0 {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    self.progressView.setProgress(0, animated: false)
+                }
+            }
+        }
+        
+        titleObservation = webView.observe(\.title, options: [.new]) { [weak self] webView, _ in
+            guard let self = self else { return }
+            if self.navigationTitle == nil {
+                self.navigationItem.title = webView.title
+            }
+        }
     }
+    
+    // MARK: - Load
+    private func loadIfPossible() {
+        guard let url = URL(string: defaultURLString) else {
+            return
+        }
+        webView.load(URLRequest(url: url))
+    }
+    
+    // MARK: - Actions
+    @objc private func refreshTapped() {
+        if webView.url != nil {
+            webView.reload()
+        } else {
+            loadIfPossible()
+        }
+    }
+}
 
-    func configure(title: String, showsChevron: Bool) {
-        titleLabel.text = title
-        // 시각적 피드백(하이라이트/셀 선택 화살표)도 원하면 accessoryType 사용 가능
-        accessoryType = showsChevron ? .disclosureIndicator : .none
-        // accessoryType과 chevronView를 동시에 쓰고 싶지 않다면, 위 한 줄을 제거하세요.
+// MARK: - WKNavigationDelegate / WKUIDelegate
+extension InfoViewController: WKNavigationDelegate, WKUIDelegate {
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        progressView.isHidden = false
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        progressView.isHidden = true
+    }
+    
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        progressView.isHidden = true
+        showAlert(message: "페이지를 불러오지 못했어요.\n\(error.localizedDescription)", title: "로드 실패")
+    }
+    
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        progressView.isHidden = true
+        showAlert(message: "페이지를 불러오지 못했어요.\n\(error.localizedDescription)", title: "로드 실패")
+    }
+    
+    func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
+        if navigationAction.targetFrame == nil {
+            webView.load(navigationAction.request)
+        }
+        return nil
     }
 }

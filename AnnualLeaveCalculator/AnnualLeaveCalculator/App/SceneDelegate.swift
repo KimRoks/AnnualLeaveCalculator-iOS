@@ -22,7 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let mainViewModel = MainViewModel(calculatorUseCase: useCase)
         let rootViewController = MainViewController(viewModel: mainViewModel)
         let navigationController = LawdingNavigationController(rootViewController: rootViewController)
-    
+        window.overrideUserInterfaceStyle = .light
         window.rootViewController = navigationController
         self.window = window
         window.makeKeyAndVisible()

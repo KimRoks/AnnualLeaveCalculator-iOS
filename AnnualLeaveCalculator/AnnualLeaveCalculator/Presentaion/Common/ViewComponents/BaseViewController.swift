@@ -7,7 +7,9 @@
 
 import UIKit
 
-class BaseViewController: UIViewController {
+class BaseViewController: UIViewController, NavigationBarTitlePresentable {
+    var navigationTitle: String? { nil }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         enableInteractivePopGesture()
