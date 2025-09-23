@@ -9,6 +9,8 @@ import UIKit
 import SnapKit
 
 final class ResultViewController: BaseViewController {
+    override var navigationTitle: String? { "계산결과" }
+    
     private let result: CalculationResultDTO
     
     private var infoBottomConstraint: Constraint?

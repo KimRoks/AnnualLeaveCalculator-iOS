@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 
 final class ResultDetailViewController: BaseViewController {
+    override var navigationTitle: String { "상세보기" }
     private let result: CalculationResultDTO
     
     // MARK: - Segmented
