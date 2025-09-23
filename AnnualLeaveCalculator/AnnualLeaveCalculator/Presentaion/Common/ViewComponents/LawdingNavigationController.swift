@@ -23,7 +23,7 @@ final class LawdingNavigationController: UINavigationController {
         let button = UIButton(type: .system)
         var config = UIButton.Configuration.plain()
         let symbolConfig = UIImage.SymbolConfiguration(pointSize: 17, weight: .medium)
-        config.image = UIImage(systemName: "line.3.horizontal", withConfiguration: symbolConfig)
+        config.image = UIImage(systemName: "info.square.fill", withConfiguration: symbolConfig)
         config.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 10)
         config.baseForegroundColor = UIColor(hex: "0015FF")
         button.configuration = config
