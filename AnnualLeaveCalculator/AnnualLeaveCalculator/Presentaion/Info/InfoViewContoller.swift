@@ -16,9 +16,9 @@ import SnapKit
 // TODO: 당장은 웹뷰로 처리, 추후 개선
 
 final class InfoViewController: BaseViewController {
-        override var navigationTitle: String? { "개인정보처리방침" }
+        override var navigationTitle: String? { "이용 약관" }
 
-    private let defaultURLString = "https://maze-palladium-edf.notion.site/Privacy-Policy-273c4b24d2e28067945efab9f6942308?source=copy_link"
+    private let defaultURLString = "https://maze-palladium-edf.notion.site/Lawding-273c4b24d2e2805f99f5f0eba1645a96?source=copy_link"
     
     private let webView: WKWebView = {
         let config = WKWebViewConfiguration()

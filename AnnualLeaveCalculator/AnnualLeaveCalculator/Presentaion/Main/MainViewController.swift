@@ -83,7 +83,8 @@ class MainViewController: BaseViewController {
     private let addHolidayButton: ChevronButton = ChevronButton(title: "추가하기")
     private let holidayListTableView: UITableView = UITableView()
     
-    private let confirmButton = ConfirmButton(title: "계산하기")
+    private let termsView: TermsView = TermsView()
+    private let confirmButton: ConfirmButton = ConfirmButton(title: "계산하기")
     
     // MARK: Loading Overlay
     private var loadingOverlay: LoadingOverlayView?
@@ -145,6 +146,7 @@ class MainViewController: BaseViewController {
             firstCardStackView,
             secondCardStackView,
             thirdCardStackView,
+            termsView,
             confirmButton
         )
         
@@ -377,6 +379,12 @@ class MainViewController: BaseViewController {
         // Fiscal(회계연도 시작일)
         fiscalYearButton.onMonthChanged = { [weak self] date in
             self?.viewModel.setFiscalYearDate.send(date)
+        }
+        
+        //약관 확인
+        termsView.onTapTerms = { [weak self] in
+            let infoViewController = InfoViewController()
+            self?.navigationController?.pushViewController(infoViewController, animated: true)
         }
         
         // 확인(계산하기) → 요청 빌드
