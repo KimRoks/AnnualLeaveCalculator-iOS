@@ -33,15 +33,21 @@ extension AnnualLeaveTarget: TargetType {
         }
     }
     
-    var headers: [String : String]? {
-        switch self {
-        case .calculate:
-            return [
-                "Content-Type": "application/json",
-                "X-Platform": "ios",
-                "X-Test": "true"
-            ]
-        }
+    private var xTestFlag: String {
+        #if DEBUG
+            return "true"
+        #else
+            return "false"
+        #endif
+    }
+    
+    var headers: [String: String]? {
+        [
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-Platform": "ios",
+            "X-Test": xTestFlag
+        ]
     }
     
     var parameters: [String: Any]? {
