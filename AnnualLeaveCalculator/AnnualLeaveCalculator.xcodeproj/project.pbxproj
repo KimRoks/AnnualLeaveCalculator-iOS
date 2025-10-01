@@ -157,6 +157,7 @@
 				DEVELOPMENT_TEAM = 85T5UV3AAF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AnnualLeaveCalculator/App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lawding;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -189,6 +190,7 @@
 				DEVELOPMENT_TEAM = 85T5UV3AAF;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AnnualLeaveCalculator/App/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Lawding;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
