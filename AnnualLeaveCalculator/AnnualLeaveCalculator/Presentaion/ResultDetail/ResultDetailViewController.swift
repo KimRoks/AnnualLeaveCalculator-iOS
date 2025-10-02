@@ -62,6 +62,8 @@ final class ResultDetailViewController: BaseViewController {
     private let baseAnnualLeaveLabel: UILabel = UILabel()
     ///가산 연차
     private let additionalLeaveLabel: UILabel = UILabel()
+    ///비례율
+    private let prescribedWorkingRatioForProratedLabel: UILabel = UILabel()
     ///총 발생 연차
     private let totalLeaveDaysLabel: UILabel = UILabel()
     private let detailSeparatorBottom: Separator = Separator()
@@ -194,6 +196,7 @@ final class ResultDetailViewController: BaseViewController {
             serviceYearsLabel,
             attendanceRateLabel,
             prescribedWorkingRatioLabel,
+            prescribedWorkingRatioForProratedLabel,
             baseAnnualLeaveLabel,
             additionalLeaveLabel,
             detailSeparatorBottom,
@@ -308,6 +311,7 @@ final class ResultDetailViewController: BaseViewController {
             serviceYearsLabel,
             attendanceRateLabel,
             prescribedWorkingRatioLabel,
+            prescribedWorkingRatioForProratedLabel,
             baseAnnualLeaveLabel,
             additionalLeaveLabel,
             totalLeaveDaysLabel
@@ -368,7 +372,6 @@ final class ResultDetailViewController: BaseViewController {
                 accrualPeriodLabel.text = "연차 산정 기간:  \(monthly.accrualPeriod.startDate) ~ \(monthly.accrualPeriod.endDate)"
                 availablePeriodLabel.text = "연차 사용 기간:  \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
                 totalLeaveDaysLabel.text = "연차 합계:  \(formatNumber(monthly.totalLeaveDays))일"
-
                 if let attendanceRate = monthly.attendanceRate {
                     attendanceRateLabel.text = "출근율:  \(formatPercent(attendanceRate))"
                 } else {
@@ -379,12 +382,14 @@ final class ResultDetailViewController: BaseViewController {
                 } else {
                     prescribedWorkingRatioLabel.text = "소정근로비율:  -"
                 }
+                prescribedWorkingRatioForProratedLabel.isHidden = true
             } else {
                 accrualPeriodLabel.text = "월차 산정 기간:  -"
                 availablePeriodLabel.text = "월차 사용 기간:  -"
                 totalLeaveDaysLabel.text = "월차 합계:  -"
                 attendanceRateLabel.text = "출근율:  -"
                 prescribedWorkingRatioLabel.text = "소정근로비율:  -"
+                prescribedWorkingRatioForProratedLabel.isHidden = true
             }
 
             // 공통 필드
@@ -421,6 +426,15 @@ final class ResultDetailViewController: BaseViewController {
                     prescribedWorkingRatioLabel.text = "소정근로비율:  -"
                     prescribedWorkingRatioLabel.isHidden = false
                 }
+                
+                if let prescribedWorkingRatioForProrated = prorated.prescribedWorkingRatioForProrated {
+                    prescribedWorkingRatioForProratedLabel.isHidden = false
+                    prescribedWorkingRatioForProratedLabel.text = "비례율:  \(formatPercent(prescribedWorkingRatioForProrated))"
+                } else {
+                    prescribedWorkingRatioForProratedLabel.isHidden = false
+                    prescribedWorkingRatioForProratedLabel.text = "비례율:  -"
+                }
+                
                 records = prorated.records ?? result.calculationDetail.records ?? []
             } else {
                 accrualPeriodLabel.text = "비례연차 산정 기간:  -"
@@ -428,6 +442,8 @@ final class ResultDetailViewController: BaseViewController {
                 totalLeaveDaysLabel.text = "비례연차 합계:  -"
                 attendanceRateLabel.text = "출근율:  -"
                 prescribedWorkingRatioLabel.text = "소정근로비율:  -"
+                prescribedWorkingRatioForProratedLabel.isHidden = false
+                prescribedWorkingRatioForProratedLabel.text = "비례율:  -"
                 attendanceRateLabel.isHidden = false
                 prescribedWorkingRatioLabel.isHidden = false
 
