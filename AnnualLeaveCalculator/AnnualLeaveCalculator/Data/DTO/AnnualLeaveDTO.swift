@@ -69,7 +69,6 @@ public struct CalculationResultDTO: Decodable {
         
         public let monthlyDetail: MonthlyDetail?
         public let proratedDetail: ProratedDetail?
-        public let prescribedWorkingRatioForProrated: Double?
 
         public enum CodingKeys: String, CodingKey {
             case accrualPeriod
@@ -83,19 +82,24 @@ public struct CalculationResultDTO: Decodable {
             case records
             case monthlyDetail
             case proratedDetail
-            case prescribedWorkingRatioForProrated
         }
     }
     
     public struct MonthlyDetail: Decodable {
         public let accrualPeriod: Period
         public let availablePeriod: Period
+        public let attendanceRate: Double?
+        public let prescribedWorkingRatio: Double?
+        public let serviceYears: Int
         public let totalLeaveDays: Double
         public let records: [Record]
-        
+
         public enum CodingKeys: String, CodingKey {
             case accrualPeriod
             case availablePeriod
+            case attendanceRate
+            case prescribedWorkingRatio
+            case serviceYears
             case totalLeaveDays
             case records
         }
@@ -106,14 +110,20 @@ public struct CalculationResultDTO: Decodable {
         public let availablePeriod: Period
         public let attendanceRate: Double?
         public let prescribedWorkingRatio: Double?
+        public let serviceYears: Int?
         public let totalLeaveDays: Double
-        
+        public let prescribedWorkingRatioForProrated: Double?
+        public let records: [Record]?
+
         public enum CodingKeys: String, CodingKey {
             case accrualPeriod
             case availablePeriod
             case attendanceRate
             case prescribedWorkingRatio
+            case serviceYears
             case totalLeaveDays
+            case prescribedWorkingRatioForProrated
+            case records
         }
     }
     
