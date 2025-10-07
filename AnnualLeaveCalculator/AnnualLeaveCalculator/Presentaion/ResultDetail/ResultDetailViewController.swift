@@ -382,7 +382,11 @@ final class ResultDetailViewController: BaseViewController {
                 } else {
                     prescribedWorkingRatioLabel.text = "소정근로비율:  -"
                 }
+                
+                // 월차 + 비례에서 월차 파트엔 아래부분들이 없음
                 prescribedWorkingRatioForProratedLabel.isHidden = true
+                baseAnnualLeaveLabel.isHidden = true
+                additionalLeaveLabel.isHidden = true
             } else {
                 accrualPeriodLabel.text = "월차 산정 기간:  -"
                 availablePeriodLabel.text = "월차 사용 기간:  -"
@@ -434,8 +438,11 @@ final class ResultDetailViewController: BaseViewController {
                     prescribedWorkingRatioForProratedLabel.isHidden = false
                     prescribedWorkingRatioForProratedLabel.text = "비례율:  -"
                 }
-                
                 records = prorated.records ?? result.calculationDetail.records ?? []
+
+                // 월차 + 비례에서 비례연차 파트엔 아래부분들이 없음
+                baseAnnualLeaveLabel.isHidden = true
+                additionalLeaveLabel.isHidden = true
             } else {
                 accrualPeriodLabel.text = "비례연차 산정 기간:  -"
                 availablePeriodLabel.text = "비례연차 사용 기간:  -"
@@ -446,7 +453,6 @@ final class ResultDetailViewController: BaseViewController {
                 prescribedWorkingRatioForProratedLabel.text = "비례율:  -"
                 attendanceRateLabel.isHidden = false
                 prescribedWorkingRatioLabel.isHidden = false
-
                 records = []
             }
 
