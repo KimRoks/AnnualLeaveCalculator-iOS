@@ -455,7 +455,7 @@ final class ResultViewController: BaseViewController {
             if let period = result.calculationDetail.availablePeriod {
                 return "사용 기간:  \(period.startDate) ~ \(period.endDate)"
             } else {
-                guard let monthlyPeriod = result.calculationDetail.monthlyDetail?.accrualPeriod else {
+                guard let monthlyPeriod = result.calculationDetail.monthlyDetail?.availablePeriod else {
                     return "사용 기간 -"
                 }
                 return "월차 사용 기간:  \(monthlyPeriod.startDate) ~ \(monthlyPeriod.endDate)"

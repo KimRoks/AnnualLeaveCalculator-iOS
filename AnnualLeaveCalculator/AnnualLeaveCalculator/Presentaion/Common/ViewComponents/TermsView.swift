@@ -43,7 +43,7 @@ final class TermsView: UIView, UITextViewDelegate {
     }
 
     private func configureText() {
-        let fullText = "계산하기 버튼을 통해 앱 이용약관에 동의한걸로 간주됩니다."
+        let fullText = "계산하기 버튼을 통해 앱 이용약관에 동의한 것으로 간주됩니다."
         let attr = NSMutableAttributedString(
             string: fullText,
             attributes: [
