@@ -14,7 +14,7 @@ final class ConfirmButton: UIButton {
         setTitle(title, for: .normal)
         setTitleColor(.white, for: .normal)
         titleLabel?.font = .pretendard(style: .bold, size: 16)
-        backgroundColor = UIColor(hex: "506BFA")
+        backgroundColor = UIColor.brandColor
         layer.cornerRadius = 10
         clipsToBounds = true
     }
