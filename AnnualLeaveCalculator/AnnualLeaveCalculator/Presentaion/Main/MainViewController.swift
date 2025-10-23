@@ -527,7 +527,7 @@ class MainViewController: BaseViewController {
         firstCardStackView.layer.cornerRadius = 12
         firstCardStackView.layer.masksToBounds = true
         firstCardStackView.layer.borderWidth = 1.5
-        firstCardStackView.layer.borderColor = UIColor(hex: "#506BFA").cgColor
+        firstCardStackView.layer.borderColor = UIColor.brandColor.cgColor
     }
 }
 

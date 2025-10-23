@@ -13,9 +13,10 @@ final class LawdingNavigationController: UINavigationController {
     
     private lazy var titleLabel: PaddedLabel = {
         let label = PaddedLabel(insets: .init(top: 0, left: 10, bottom: 0, right: 0))
-        label.text = "Lawding"
+        label.text = "LawDing"
         label.font = .pretendard(style: .bold, size: navigationFontSize)
-        label.textColor = UIColor(hex: "0015FF")
+        label.textColor = UIColor.brandColor
+
         return label
     }()
     
@@ -25,7 +26,7 @@ final class LawdingNavigationController: UINavigationController {
         let symbolConfig = UIImage.SymbolConfiguration(pointSize: 17, weight: .medium)
         config.image = UIImage(systemName: "info.square.fill", withConfiguration: symbolConfig)
         config.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 10)
-        config.baseForegroundColor = UIColor(hex: "0015FF")
+        config.baseForegroundColor = UIColor.brandColor
         button.configuration = config
         button.heightAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
         button.widthAnchor.constraint(greaterThanOrEqualToConstant: 44).isActive = true
@@ -62,7 +63,7 @@ final class LawdingNavigationController: UINavigationController {
         
         let titleAttrs: [NSAttributedString.Key: Any] = [
             .font: UIFont.pretendard(style: .bold, size: navigationFontSize),
-            .foregroundColor: UIColor(hex: "0015FF")
+            .foregroundColor: UIColor.brandColor
         ]
         appearance.titleTextAttributes = titleAttrs
         let plain = UIBarButtonItemAppearance(style: .plain)
@@ -75,7 +76,7 @@ final class LawdingNavigationController: UINavigationController {
         navigationBar.compactAppearance = appearance
         navigationBar.isTranslucent = false
         
-        navigationBar.tintColor = UIColor(hex: "0015FF")
+        navigationBar.tintColor = UIColor.brandColor
     }
     
     private func applyNavigationItems(to viewController: UIViewController) {
@@ -88,10 +89,12 @@ final class LawdingNavigationController: UINavigationController {
             config.image = chevron
             config.attributedTitle = AttributedString(
                 "뒤로",
-                attributes: AttributeContainer([.font: UIFont.pretendard(style: .bold, size: navigationFontSize)])
+                attributes: AttributeContainer(
+                    [.font: UIFont.pretendard(style: .bold, size: navigationFontSize)]
+                )
             )
             config.imagePadding = 4
-            config.baseForegroundColor = UIColor(hex: "0015FF")
+            config.baseForegroundColor = UIColor.brandColor
             config.contentInsets = .init(top: 0, leading: 10, bottom: 0, trailing: 0)
             backButton.configuration = config
             viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: backButton)

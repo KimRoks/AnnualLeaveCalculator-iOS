@@ -25,4 +25,14 @@ extension UIColor {
             alpha: alpha
         )
     }
+    
+    static var brandColor: UIColor {
+        UIColor { trait in
+            if trait.userInterfaceStyle == .dark {
+                return UIColor(hex: "506BFA")
+            } else {
+                return UIColor(hex: "506BFA")
+            }
+        }
+    }
 }
