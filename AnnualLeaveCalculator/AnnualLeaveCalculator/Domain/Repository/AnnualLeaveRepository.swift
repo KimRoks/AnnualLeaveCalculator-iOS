@@ -16,4 +16,12 @@ public protocol AnnualLeaveRepository {
         nonWorkingPeriods: [NonWorkingPeriod]?,
         companyHolidays: [String]?
     ) async throws -> CalculationResultDTO
+    
+    func sendFeedback(
+        type: FeedbackType,
+        content: String,
+        email: String?,
+        rating: Int?,
+        calculationId: String?
+    ) async throws
 }

@@ -16,12 +16,21 @@ enum AnnualLeaveTarget {
         nonWorkingPeriods: [NonWorkingPeriod]?,
         companyHolidays: [String]?
     )
+    case submitFeedback(
+        type: String,
+        content: String,
+        email: String?,
+        rating: Int?,
+        calculationId: String?
+    )
 }
 
 extension AnnualLeaveTarget: TargetType {
     var method: HTTPMethods {
         switch self {
         case .calculate:
+            return .post
+        case .submitFeedback:
             return .post
         }
     }
@@ -30,6 +39,8 @@ extension AnnualLeaveTarget: TargetType {
         switch self {
         case .calculate:
             return "/calculate"
+        case .submitFeedback:
+            return "/feedback"
         }
     }
     
@@ -42,12 +53,23 @@ extension AnnualLeaveTarget: TargetType {
     }
     
     var headers: [String: String]? {
-        [
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-            "X-Platform": "ios",
-            "X-Test": xTestFlag
-        ]
+        
+        switch self {
+            
+        case .calculate:
+            return [
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "X-Platform": "ios",
+                "X-Test": xTestFlag
+            ]
+        case .submitFeedback:
+            return [
+                "Content-Type": "application/json",
+                "X-Platform": "ios",
+                "X-Test": xTestFlag
+            ]
+        }
     }
     
     var parameters: [String: Any]? {
@@ -74,6 +96,32 @@ extension AnnualLeaveTarget: TargetType {
             if let companyHolidays = companyHolidays {
                 dict["companyHolidays"] = companyHolidays
             }
+            return dict
+            
+        case .submitFeedback(
+            type: let type,
+            content: let content,
+            email: let email,
+            rating: let rating,
+            calculationId: let calculationId
+        ):
+            var dict: [String: Any] = [
+                "type": type,
+                "content": content,
+            ]
+            
+            if let email = email {
+                dict["email"] = email
+            }
+            
+            if let rating = rating {
+                dict["rating"] = rating
+            }
+            
+            if let calculationId = calculationId {
+                dict["calculationId"] = calculationId
+            }
+            
             return dict
         }
     }
