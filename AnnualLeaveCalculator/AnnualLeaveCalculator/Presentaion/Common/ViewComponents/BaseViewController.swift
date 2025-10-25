@@ -6,7 +6,7 @@
 //
 
 import UIKit
-class BaseViewController: UIViewController, NavigationBarTitlePresentable {
+class BaseViewController: UIViewController, NavigationBarTitlePresentable, ToastDisplayable {
     var navigationTitle: String? { nil }
     
     override func viewDidLoad() {
