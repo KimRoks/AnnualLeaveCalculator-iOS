@@ -35,7 +35,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                     duration: 0.3,
                     options: [.transitionCrossDissolve],
                     animations: {
-                        UIView.performWithoutAnimation {                            window.rootViewController = main
+                        UIView.performWithoutAnimation {
+                            window.rootViewController = main
                             window.layoutIfNeeded()
                         }
                     },
