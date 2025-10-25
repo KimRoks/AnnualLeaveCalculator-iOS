@@ -10,7 +10,7 @@ import SnapKit
 import Combine
 
 final class FeedbackViewController: BaseViewController {
-    
+    private let maxMessageLength = 1000
     // MARK: - Dependencies
     private let result: CalculationResultDTO
     private let viewModel: FeedbackViewModel
@@ -77,6 +77,15 @@ final class FeedbackViewController: BaseViewController {
         tv.isScrollEnabled = false
         tv.backgroundColor = .clear
         return tv
+    }()
+    
+    private let messageCounterLabel: UILabel = {
+        let l = UILabel()
+        l.font = .pretendard(style: .regular, size: 12)
+        l.textColor = .secondaryLabel
+        l.textAlignment = .right
+        
+        return l
     }()
     
     private let messagePlaceholderLabel: UILabel = {
@@ -165,8 +174,12 @@ final class FeedbackViewController: BaseViewController {
         )
         
         // 내용 컨테이너
-        messageContainer.addSubview(messageTextView)
-        messageContainer.addSubview(messagePlaceholderLabel)
+        messageContainer.addSubviews(
+            messageTextView,
+            messagePlaceholderLabel,
+            messageCounterLabel
+        )
+        
         
         // 첨부 스위치 행
         attachRow.axis = .horizontal
@@ -200,15 +213,20 @@ final class FeedbackViewController: BaseViewController {
             messageHeightConstraint = $0.height.greaterThanOrEqualTo(110).constraint
         }
         messageTextView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(5)
+            $0.edges.equalToSuperview().inset(8)
         }
         messagePlaceholderLabel.snp.makeConstraints {
-            $0.top.equalTo(messageTextView).inset(5)
-            $0.left.equalTo(messageTextView).inset(5)
+            $0.top.equalTo(messageTextView).inset(8)
+            $0.left.equalTo(messageTextView).inset(8)
         }
         
         emailTextField.snp.makeConstraints {
             $0.height.equalTo(44)
+        }
+        
+        messageCounterLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(5)
+            $0.trailing.equalToSuperview().inset(5)
         }
         
         attachSwitch.setContentHuggingPriority(.required, for: .horizontal)
@@ -266,6 +284,10 @@ final class FeedbackViewController: BaseViewController {
         UIView.animate(withDuration: 0.2) {
             self.view.layoutIfNeeded()
         }
+    }
+    
+    private func updateCounter() {
+        messageCounterLabel.text = "\(messageTextView.text.count)/\(maxMessageLength)"
     }
     
     // MARK: - Bindings
@@ -375,7 +397,30 @@ final class FeedbackViewController: BaseViewController {
 // MARK: - UITextViewDelegate
 extension FeedbackViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
+        if textView.markedTextRange == nil, textView.text.count > maxMessageLength {
+            // 안전하게 초과분 잘라내기
+            let endIndex = textView.text.index(textView.text.startIndex, offsetBy: maxMessageLength)
+            textView.text = String(textView.text[..<endIndex])
+        }
         updatePlaceholderVisibility()
         updateMessageHeight()
+        updateCounter()
     }
+    
+    func textView(_ textView: UITextView,
+                      shouldChangeTextIn range: NSRange,
+                      replacementText text: String) -> Bool {
+
+            // IME 조합 중이면 길이 체크 스킵
+            if textView.markedTextRange != nil { return true }
+
+            guard let current = textView.text,
+                  let stringRange = Range(range, in: current) else {
+                return true
+            }
+            let updated = current.replacingCharacters(in: stringRange, with: text)
+
+            // 이 줄 하나로 키입력/붙여넣기/드래그 모두 제한됨
+            return updated.count <= maxMessageLength
+        }
 }
