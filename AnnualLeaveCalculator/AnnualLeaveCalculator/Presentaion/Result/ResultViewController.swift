@@ -129,6 +129,7 @@ final class ResultViewController: BaseViewController {
     }()
     
     private let detailButton: ChevronButton = ChevronButton(title: "이동")
+    private let feedbackLinkView: FeedbackLinkView = FeedbackLinkView()
     private let completeButton: ConfirmButton = ConfirmButton(title: "처음으로")
     
     // MARK: LifeCycle
@@ -145,6 +146,20 @@ final class ResultViewController: BaseViewController {
         detailButton.addAction(UIAction { [weak self]_ in
             self?.pushToResultDetailVC()
         }, for: .touchUpInside)
+        
+        feedbackLinkView.onTapFeedback = { [weak self] in
+            guard let self = self else { return }
+            let vm = FeedbackViewModel(
+                useCase: DefaultAnnualLeaveCalculatorUseCase(
+                    annualLeaveRepository: AnnualLeaveRepositoryImpl()
+                )
+            )
+            let vc = FeedbackViewController(
+                viewModel: vm,
+                result: result
+            )
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // MARK: init
@@ -286,6 +301,7 @@ final class ResultViewController: BaseViewController {
             resultCardView,
             infoCardView,
             detailCardView,
+            feedbackLinkView,
             completeButton
         )
         
@@ -399,8 +415,13 @@ final class ResultViewController: BaseViewController {
             $0.bottom.equalToSuperview().offset(-20)
         }
         
-        completeButton.snp.makeConstraints {
+        feedbackLinkView.snp.makeConstraints {
             $0.top.equalTo(detailCardView.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        completeButton.snp.makeConstraints {
+            $0.top.equalTo(feedbackLinkView.snp.bottom).offset(20)
             $0.leading.equalTo(contentView).offset(20)
             $0.trailing.equalTo(contentView).offset(-20)
             $0.height.equalTo(50)
