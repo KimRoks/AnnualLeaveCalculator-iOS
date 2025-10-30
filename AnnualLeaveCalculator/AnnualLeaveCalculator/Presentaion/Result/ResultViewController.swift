@@ -152,7 +152,7 @@ final class ResultViewController: BaseViewController {
             let vm = FeedbackViewModel(
                 useCase: DefaultAnnualLeaveCalculatorUseCase(
                     annualLeaveRepository: AnnualLeaveRepositoryImpl()
-                )
+                ), logger: FirebaseAnalyticsLogger()
             )
             let vc = FeedbackViewController(
                 viewModel: vm,

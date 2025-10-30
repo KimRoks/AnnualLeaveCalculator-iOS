@@ -17,7 +17,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let repository = AnnualLeaveRepositoryImpl()
         let useCase = DefaultAnnualLeaveCalculatorUseCase(annualLeaveRepository: repository)
-        let mainViewModel = MainViewModel(calculatorUseCase: useCase)
+        let logger = FirebaseAnalyticsLogger()
+        let mainViewModel = MainViewModel(calculatorUseCase: useCase, logger: logger)
         let rootViewController = MainViewController(viewModel: mainViewModel)
         let navigationController = LawdingNavigationController(rootViewController: rootViewController)
         window.overrideUserInterfaceStyle = .light

@@ -50,6 +50,7 @@ enum MainValidationError: LocalizedError {
 }
 
 final class MainViewModel {
+    private let logger: AnalyticsLogging
 
     // MARK: - Inputs
     let removeHoliday = PassthroughSubject<IndexPath, Never>()
@@ -93,8 +94,12 @@ final class MainViewModel {
         }()
     
 
-    init(calculatorUseCase: AnnualLeaveCalculatorUseCase) {
+    init(
+        calculatorUseCase: AnnualLeaveCalculatorUseCase,
+        logger: AnalyticsLogging
+    ) {
         self.calculatorUseCase = calculatorUseCase
+        self.logger = logger
         bind()
     }
 
@@ -138,7 +143,7 @@ final class MainViewModel {
         confirmTapped
             .sink { [weak self] in
                 guard let self = self else { return }
-
+                logger.log(.tapCalculate)
                 let hireDate = self.setHireDate.value
                 let referenceDate = self.setReferenceDate.value
 
@@ -315,11 +320,13 @@ final class MainViewModel {
                     self.lastResult = result
                     self.isLoading = false
                 }
+                logger.log(.calculateSucceeded)
             } catch {
                 await MainActor.run {
                     self.isLoading = false
                     self.error.send(error)
                 }
+                logger.log(.calculateFailed(error: error))
             }
         }
     }
