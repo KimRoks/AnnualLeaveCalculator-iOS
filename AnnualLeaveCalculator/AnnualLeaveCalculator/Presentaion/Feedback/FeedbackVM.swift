@@ -7,14 +7,12 @@
 
 import Foundation
 import Combine
-import Foundation
-import Combine
 
 /// 피드백 화면용 ViewModel
 /// - 입력: 유형 인덱스, 메시지, 이메일, 첨부 여부, 평점, 계산ID, 전송 트리거
 /// - 출력: 제출 가능 여부, 로딩, 성공 시그널, 에러
 final class FeedbackViewModel {
-    
+    let logger: AnalyticsLogging
     // MARK: - Inputs
     /// 세그먼트 인덱스(0: 오류 제보, 1: 서비스 문의, 2: 개선 요청, 3: 기타)
     let setSelectedTypeIndex = CurrentValueSubject<Int, Never>(0)
@@ -62,8 +60,12 @@ final class FeedbackViewModel {
     private let minimumMessageLength: Int = 5
     
     // MARK: - Init
-    init(useCase: AnnualLeaveCalculatorUseCase) {
+    init(
+        useCase: AnnualLeaveCalculatorUseCase,
+        logger: AnalyticsLogging
+    ) {
         self.useCase = useCase
+        self.logger = logger
         bind()
     }
     
@@ -94,6 +96,7 @@ final class FeedbackViewModel {
         // 제출
         submitTapped
             .sink { [weak self] in
+                self?.logger.log(.tapSubmitFeedback)
                 self?.handleSubmit()
             }
             .store(in: &cancellables)
@@ -146,11 +149,13 @@ final class FeedbackViewModel {
                     self.isSubmitting = false
                     self.didSubmit = true
                 }
+                self.logger.log(.feedbackSucceeded)
             } catch {
                 await MainActor.run {
                     self.isSubmitting = false
                     self.error.send(error)
                 }
+                self.logger.log(.feedbackFailed(error: error))
             }
         }
     }
