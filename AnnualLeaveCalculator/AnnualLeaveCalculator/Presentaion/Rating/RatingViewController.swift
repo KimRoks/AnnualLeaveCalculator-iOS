@@ -13,7 +13,8 @@ final class RatingViewController: UIViewController, ToastDisplayable {
     // MARK: - Dependencies
     private let useCase: AnnualLeaveCalculatorUseCase
     private let ratingManager: RatingPromptManager
-
+    private let logger = FirebaseAnalyticsLogger()
+    
     // MARK: - State
     private var selectedRating: Int? {
         didSet {
@@ -195,6 +196,7 @@ final class RatingViewController: UIViewController, ToastDisplayable {
     // MARK: - Actions
     @objc private func didTapOutside() {
         ratingManager.markDismissedThisSession()
+        logger.log(.ratingDismissed)
         dismiss(animated: true)
     }
 
@@ -221,6 +223,7 @@ final class RatingViewController: UIViewController, ToastDisplayable {
                     self.dismiss(animated: true)
                     self.showToast(message: "피드백 전송을 완료했어요.")
                     self.ratingManager.markSubmitted()
+                    self.logger.log(.ratingSubmitted(score: rating))
                 }
             } catch {
                 await MainActor.run {
