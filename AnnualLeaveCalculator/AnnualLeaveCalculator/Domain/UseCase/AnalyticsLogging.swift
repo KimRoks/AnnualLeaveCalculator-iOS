@@ -19,4 +19,7 @@ public enum AppEvent {
     case tapSubmitFeedback
     case feedbackSucceeded
     case feedbackFailed(error: Error)
+    
+    case ratingSubmitted(score: Int)
+    case ratingDismissed
 }

@@ -23,6 +23,13 @@ enum AnnualLeaveTarget {
         rating: Int?,
         calculationId: String?
     )
+    case submitRating(
+        type: String,
+        content: String?,
+        email: String?,
+        rating: Int,
+        calculationId: String?
+    )
 }
 
 extension AnnualLeaveTarget: TargetType {
@@ -32,6 +39,8 @@ extension AnnualLeaveTarget: TargetType {
             return .post
         case .submitFeedback:
             return .post
+        case .submitRating:
+            return .post
         }
     }
     
@@ -40,6 +49,8 @@ extension AnnualLeaveTarget: TargetType {
         case .calculate:
             return "/calculate"
         case .submitFeedback:
+            return "/feedback"
+        case .submitRating:
             return "/feedback"
         }
     }
@@ -66,6 +77,13 @@ extension AnnualLeaveTarget: TargetType {
         case .submitFeedback:
             return [
                 "Content-Type": "application/json",
+                "X-Platform": "ios",
+                "X-Test": xTestFlag
+            ]
+        case .submitRating:
+            return [
+                "Content-Type": "application/json",
+                "Accept": "application/json",
                 "X-Platform": "ios",
                 "X-Test": xTestFlag
             ]
@@ -116,6 +134,31 @@ extension AnnualLeaveTarget: TargetType {
             
             if let rating = rating {
                 dict["rating"] = rating
+            }
+            
+            if let calculationId = calculationId {
+                dict["calculationId"] = calculationId
+            }
+            
+            return dict
+        case .submitRating(
+            type: _,
+            content: let content,
+            email: let email,
+            rating: let rating,
+            calculationId: let calculationId
+        ):
+            var dict: [String: Any] = [
+                "type": "SATISFACTION",
+                "rating": rating
+            ]
+            
+            if let email = email {
+                dict["email"] = email
+            }
+                        
+            if let content = content {
+                dict["content"] = content
             }
             
             if let calculationId = calculationId {

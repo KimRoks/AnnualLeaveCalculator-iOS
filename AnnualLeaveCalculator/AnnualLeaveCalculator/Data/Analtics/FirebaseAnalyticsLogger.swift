@@ -55,6 +55,18 @@ final class FirebaseAnalyticsLogger: AnalyticsLogging {
                     "error_desc": info.descriptionShort
                 ]
             )
+        case .ratingSubmitted(score: let score):
+            Analytics.logEvent(
+                "rating_submitted",
+                parameters: [
+                    "score": NSNumber(value: score)
+                ]
+            )
+        case .ratingDismissed:
+            Analytics.logEvent(
+                "rating_dismissed",
+                parameters: nil
+            )
         }
     }
     
