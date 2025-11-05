@@ -24,4 +24,12 @@ public protocol AnnualLeaveRepository {
         rating: Int?,
         calculationId: String?
     ) async throws
+    
+    func sendRating(
+        type: FeedbackType,
+        content: String?,
+        email: String?,
+        rating: Int,
+        calculationId: String?
+    ) async throws
 }

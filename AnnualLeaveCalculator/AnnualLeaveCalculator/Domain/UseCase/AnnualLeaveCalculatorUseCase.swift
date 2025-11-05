@@ -58,6 +58,14 @@ public protocol AnnualLeaveCalculatorUseCase {
         rating: Int?,
         calculationId: String?
     ) async throws
+    
+    func submitRating(
+        type: FeedbackType,
+        content: String?,
+        email: String?,
+        rating: Int,
+        calculationId: String?
+    ) async throws
 }
 
 final class DefaultAnnualLeaveCalculatorUseCase: AnnualLeaveCalculatorUseCase {
@@ -102,6 +110,26 @@ final class DefaultAnnualLeaveCalculatorUseCase: AnnualLeaveCalculatorUseCase {
                 content: content,
                 email: email,
                 rating: nil,
+                calculationId: calculationId
+            )
+        } catch {
+            throw error
+        }
+    }
+    
+    func submitRating(
+        type: FeedbackType,
+        content: String?,
+        email: String?,
+        rating: Int,
+        calculationId: String?
+    ) async throws {
+        do {
+            try await annualLeaveRepository.sendRating(
+                type: type,
+                content: content,
+                email: email,
+                rating: rating,
                 calculationId: calculationId
             )
         } catch {

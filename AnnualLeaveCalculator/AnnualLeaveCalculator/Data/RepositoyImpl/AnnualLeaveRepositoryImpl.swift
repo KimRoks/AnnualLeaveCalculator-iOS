@@ -91,4 +91,37 @@ struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
             throw NetworkError.requestFailed
         }
     }
+    
+    func sendRating(
+        type: FeedbackType,
+        content: String?,
+        email: String?,
+        rating: Int,
+        calculationId: String?
+    ) async throws {
+        guard let request = try? AnnualLeaveTarget.submitRating(
+            type: type.apiString,
+            content: content,
+            email: email,
+            rating: rating,
+            calculationId: calculationId
+        ).asURLRequest() else {
+            throw NetworkError.invalidURLError
+        }
+        
+        let (_, response) = try await session.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.unknown
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            return
+        case 401:
+            throw NetworkError.unauthorized
+        default:
+            throw NetworkError.requestFailed
+        }
+    }
 }
