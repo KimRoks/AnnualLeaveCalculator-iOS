@@ -10,7 +10,7 @@ import SnapKit
 
 final class ResultViewController: BaseViewController {
     override var navigationTitle: String? { "계산결과" }
-    
+    private let ratingManager = RatingPromptManager()
     private let result: CalculationResultDTO
     
     private var infoBottomConstraint: Constraint?
@@ -173,7 +173,19 @@ final class ResultViewController: BaseViewController {
     }
     
     private func completeButtonTapped() {
-        self.navigationController?.popToRootViewController(animated: true)
+        if ratingManager.canShowPrompt() {
+            self.present(
+                RatingViewController(
+                    useCase: DefaultAnnualLeaveCalculatorUseCase(
+                        annualLeaveRepository: AnnualLeaveRepositoryImpl()
+                    ),
+                    ratingManager: ratingManager
+                ),
+                animated: true
+            )
+        } else {
+            self.navigationController?.popToRootViewController(animated: true)
+        }
     }
     
     // MARK: ConfigureUI
