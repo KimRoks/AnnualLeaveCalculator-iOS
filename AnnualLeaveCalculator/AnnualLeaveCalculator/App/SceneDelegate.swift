@@ -58,6 +58,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_ scene: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        guard let scene = scene as? UIWindowScene else { return }
+        let minSupported = "1.1.3"
+        let appStoreId = "6751892414"
+        let message = "필수 업데이트 적용을 위해 최신 버전으로 업데이트 해주세요."
+        
+        ForceUpdateGatekeeper.shared.evaluateAndPresentIfNeeded(
+            minSupportedVersion: minSupported,
+            appStoreId: appStoreId,
+            message: message,
+            in: scene
+        )
     }
     
     func sceneWillResignActive(_ scene: UIScene) {
