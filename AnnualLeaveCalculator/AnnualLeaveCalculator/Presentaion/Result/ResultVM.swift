@@ -100,8 +100,8 @@ public final class ResultViewModel {
         let detail = dto.calculationDetail
         self.accrualPeriod = detail.accrualPeriod
         self.availablePeriod = detail.availablePeriod
-        self.attendanceRate = detail.attendanceRate
-        self.prescribedWorkingRatio = detail.prescribedWorkingRatio
+        self.attendanceRate = detail.attendanceRate?.rate
+        self.prescribedWorkingRatio = detail.prescribedWorkingRatio?.rate
         self.serviceYears = detail.serviceYears
         self.totalLeaveDays = detail.totalLeaveDays
         self.baseAnnualLeave = detail.baseAnnualLeave

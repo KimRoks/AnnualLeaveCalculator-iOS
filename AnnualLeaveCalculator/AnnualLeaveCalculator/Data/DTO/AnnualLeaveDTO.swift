@@ -7,6 +7,12 @@
 
 import Foundation
 
+public struct Ratio: Decodable {
+    public let numerator: Int
+    public let denominator: Int
+    public let rate: Double
+}
+
 public struct CalculationResultDTO: Decodable {
     public let calculationId: String
     public let calculationType: String
@@ -56,8 +62,8 @@ public struct CalculationResultDTO: Decodable {
     public struct CalculationDetail: Decodable {
         public let accrualPeriod: Period?
         public let availablePeriod: Period?
-        public let attendanceRate: Double?
-        public let prescribedWorkingRatio: Double?
+        public let attendanceRate: Ratio?
+        public let prescribedWorkingRatio: Ratio?
         
         public let serviceYears: Int
         public let totalLeaveDays: Double
@@ -88,8 +94,8 @@ public struct CalculationResultDTO: Decodable {
     public struct MonthlyDetail: Decodable {
         public let accrualPeriod: Period
         public let availablePeriod: Period
-        public let attendanceRate: Double?
-        public let prescribedWorkingRatio: Double?
+        public let attendanceRate: Ratio?
+        public let prescribedWorkingRatio: Ratio?
         public let serviceYears: Int
         public let totalLeaveDays: Double
         public let records: [Record]
@@ -108,8 +114,8 @@ public struct CalculationResultDTO: Decodable {
     public struct ProratedDetail: Decodable {
         public let accrualPeriod: Period
         public let availablePeriod: Period
-        public let attendanceRate: Double?
-        public let prescribedWorkingRatio: Double?
+        public let attendanceRate: Ratio?
+        public let prescribedWorkingRatio: Ratio?
         public let serviceYears: Int?
         public let totalLeaveDays: Double
         public let prescribedWorkingRatioForProrated: Double?

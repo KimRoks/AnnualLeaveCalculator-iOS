@@ -373,12 +373,12 @@ final class ResultDetailViewController: BaseViewController {
                 availablePeriodLabel.text = "연차 사용 기간:  \(monthly.availablePeriod.startDate) ~ \(monthly.availablePeriod.endDate)"
                 totalLeaveDaysLabel.text = "연차 합계:  \(formatNumber(monthly.totalLeaveDays))일"
                 if let attendanceRate = monthly.attendanceRate {
-                    attendanceRateLabel.text = "출근율:  \(formatPercent(attendanceRate))"
+                    attendanceRateLabel.text = "출근율:  \(formatPercent(attendanceRate.rate)) (\(attendanceRate.numerator)일 / \(attendanceRate.denominator)일)"
                 } else {
                     attendanceRateLabel.text = "출근율:  -"
                 }
                 if let prescribedWorkingRatio = monthly.prescribedWorkingRatio {
-                    prescribedWorkingRatioLabel.text = "소정근로비율:  \(formatPercent(prescribedWorkingRatio))"
+                    prescribedWorkingRatioLabel.text = "소정근로비율:  \(formatPercent(prescribedWorkingRatio.rate)) \(prescribedWorkingRatio.numerator)일 / \(prescribedWorkingRatio.denominator)일"
                 } else {
                     prescribedWorkingRatioLabel.text = "소정근로비율:  -"
                 }
@@ -417,14 +417,14 @@ final class ResultDetailViewController: BaseViewController {
                 totalLeaveDaysLabel.text = "비례연차 합계:  \(formatNumber(prorated.totalLeaveDays))일"
 
                 if let rate = prorated.attendanceRate {
-                    attendanceRateLabel.text = "출근율:  \(formatPercent(rate))"
+                    attendanceRateLabel.text = "출근율:  \(formatPercent(rate.rate)) (\(rate.numerator)일 / \(rate.denominator)일)"
                     attendanceRateLabel.isHidden = false
                 } else {
                     attendanceRateLabel.text = "출근율:  -"
                     attendanceRateLabel.isHidden = false
                 }
                 if let ratio = prorated.prescribedWorkingRatio {
-                    prescribedWorkingRatioLabel.text = "소정근로비율:  \(formatPercent(ratio))"
+                    prescribedWorkingRatioLabel.text = "소정근로비율:  \(formatPercent(ratio.rate)) (\(ratio.numerator)일 / \(ratio.denominator)일)"
                     prescribedWorkingRatioLabel.isHidden = false
                 } else {
                     prescribedWorkingRatioLabel.text = "소정근로비율:  -"
@@ -505,7 +505,7 @@ final class ResultDetailViewController: BaseViewController {
         serviceYearsLabel.text = "근속연수:  \(detail.serviceYears)년"
         
         if let rate = detail.attendanceRate {
-            attendanceRateLabel.text = "출근율:  \(formatPercent(rate))"
+            attendanceRateLabel.text = "출근율:  \(formatPercent(rate.rate)) (\(rate.numerator)일 / \(rate.denominator)일)"
             attendanceRateLabel.isHidden = false
         } else {
             attendanceRateLabel.text = "출근율:  -"
@@ -513,7 +513,7 @@ final class ResultDetailViewController: BaseViewController {
         }
         
         if let ratio = detail.prescribedWorkingRatio {
-            prescribedWorkingRatioLabel.text = "소정근로비율:  \(formatPercent(ratio))"
+            prescribedWorkingRatioLabel.text = "소정근로비율:  \(formatPercent(ratio.rate)) (\(ratio.numerator)일 / \(ratio.denominator)일)"
             prescribedWorkingRatioLabel.isHidden = false
         } else {
             prescribedWorkingRatioLabel.text = "소정근로비율:  -"
