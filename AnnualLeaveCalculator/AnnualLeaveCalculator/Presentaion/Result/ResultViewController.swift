@@ -123,8 +123,17 @@ final class ResultViewController: BaseViewController {
     
     private let detailLabel: UILabel = {
         let label = UILabel()
-        label.text = "상세보기"
+        label.text = "연차 계산 방법 상세보기"
+        label.textColor = .brandColor
         label.font = .pretendard(style: .bold, size: 15)
+        return label
+    }()
+    
+    private let detailDesriptionLabel: UILabel = {
+        let label = UILabel()
+        label.text = "계산 기준을 자세히 보려면 여기를 눌러주세요."
+        label.textColor = UIColor(hex: "#999999")
+        label.font = .pretendard(style: .medium, size: 12)
         return label
     }()
     
@@ -138,28 +147,7 @@ final class ResultViewController: BaseViewController {
         setupLayout()
         setupConstraints()
         configureUI()
-        
-        completeButton.addAction(UIAction { [weak self] _ in
-            self?.completeButtonTapped()
-        },for: .touchUpInside)
-        
-        detailButton.addAction(UIAction { [weak self]_ in
-            self?.pushToResultDetailVC()
-        }, for: .touchUpInside)
-        
-        feedbackLinkView.onTapFeedback = { [weak self] in
-            guard let self = self else { return }
-            let vm = FeedbackViewModel(
-                useCase: DefaultAnnualLeaveCalculatorUseCase(
-                    annualLeaveRepository: AnnualLeaveRepositoryImpl()
-                ), logger: FirebaseAnalyticsLogger()
-            )
-            let vc = FeedbackViewController(
-                viewModel: vm,
-                result: result
-            )
-            self.navigationController?.pushViewController(vc, animated: true)
-        }
+        setupActions()
     }
     
     // MARK: init
@@ -186,6 +174,37 @@ final class ResultViewController: BaseViewController {
         } else {
             self.navigationController?.popToRootViewController(animated: true)
         }
+    }
+    
+    func setupActions() {
+        completeButton.addAction(UIAction { [weak self] _ in
+            self?.completeButtonTapped()
+        },for: .touchUpInside)
+        
+        detailButton.addAction(UIAction { [weak self]_ in
+            self?.pushToResultDetailVC()
+        }, for: .touchUpInside)
+        
+        feedbackLinkView.onTapFeedback = { [weak self] in
+            guard let self = self else { return }
+            let vm = FeedbackViewModel(
+                useCase: DefaultAnnualLeaveCalculatorUseCase(
+                    annualLeaveRepository: AnnualLeaveRepositoryImpl()
+                ), logger: FirebaseAnalyticsLogger()
+            )
+            let vc = FeedbackViewController(
+                viewModel: vm,
+                result: result
+            )
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
+        
+        let tapGesture = UITapGestureRecognizer(
+                   target: self,
+                   action: #selector(pushToResultDetailVC)
+        )
+        detailCardView.isUserInteractionEnabled = true
+        detailCardView.addGestureRecognizer(tapGesture)
     }
     
     // MARK: ConfigureUI
@@ -334,6 +353,7 @@ final class ResultViewController: BaseViewController {
         
         detailCardView.addSubviews(
             detailLabel,
+            detailDesriptionLabel,
             detailButton
         )
     }
@@ -418,11 +438,16 @@ final class ResultViewController: BaseViewController {
         detailLabel.snp.makeConstraints {
             $0.top.equalToSuperview().offset(20)
             $0.leading.equalToSuperview().offset(20)
+//            $0.bottom.equalToSuperview().offset(-20)
+        }
+        detailDesriptionLabel.snp.makeConstraints {
+            $0.top.equalTo(detailLabel.snp.bottom).offset(4)
+            $0.leading.equalToSuperview().offset(20)
             $0.bottom.equalToSuperview().offset(-20)
         }
         
         detailButton.snp.makeConstraints {
-            $0.top.equalToSuperview().offset(20)
+            $0.top.equalToSuperview().offset(21)
             $0.trailing.equalToSuperview().offset(-20)
             $0.bottom.equalToSuperview().offset(-20)
         }
@@ -557,6 +582,7 @@ final class ResultViewController: BaseViewController {
         proratedAvailablePeriodBadgeLabel.attributedText = att
     }
     
+    @objc
     private func pushToResultDetailVC() {
         let resultDetailVC = ResultDetailViewController(result: result)
         self.navigationController?.pushViewController(resultDetailVC, animated: true)
