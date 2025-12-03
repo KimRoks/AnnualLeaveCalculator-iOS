@@ -51,6 +51,8 @@ final class SplashViewController: UIViewController {
     private func setupConstraints() {
         splashImageView.snp.makeConstraints {
             $0.centerX.equalTo(view.safeAreaLayoutGuide.snp.centerX)
+            $0.width.equalTo(274)
+            $0.height.equalTo(172)
             $0.centerY.equalTo(view.snp.centerY).offset(-80)
         }
     }
