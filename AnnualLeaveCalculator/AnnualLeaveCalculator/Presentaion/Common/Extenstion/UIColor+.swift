@@ -29,9 +29,9 @@ extension UIColor {
     static var brandColor: UIColor {
         UIColor { trait in
             if trait.userInterfaceStyle == .dark {
-                return UIColor(hex: "506BFA")
+                return UIColor(hex: "#0057B8")
             } else {
-                return UIColor(hex: "506BFA")
+                return UIColor(hex: "#0057B8")
             }
         }
     }
