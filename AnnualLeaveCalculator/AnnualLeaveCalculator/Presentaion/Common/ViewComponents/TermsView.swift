@@ -47,25 +47,27 @@ final class TermsView: UIView, UITextViewDelegate {
         let attr = NSMutableAttributedString(
             string: fullText,
             attributes: [
-                .font: UIFont.pretendard(style: .regular, size: 13),
-                .foregroundColor: UIColor.secondaryLabel
+                .font: UIFont.pretendard(style: .medium, size: 12),
+                .foregroundColor: UIColor(hex: "#BEC1C8")
             ]
         )
-        // '이용약관'만 링크/강조
+
         let target = "이용약관"
         let nsFullText = fullText as NSString
         let range = nsFullText.range(of: target)
+
         if range.location != NSNotFound {
             attr.addAttribute(.link, value: "lawding://terms", range: range)
-            
-            attr.addAttributes([
-                .font: UIFont.pretendard(style: .bold, size: 13),
-                .foregroundColor: UIColor.label
-            ], range: range)
         }
         textView.attributedText = attr
-        textView.tintColor = .systemBlue
+
+        textView.linkTextAttributes = [
+            .foregroundColor: UIColor.brandColor,
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .font: UIFont.pretendard(style: .bold, size: 12)
+        ]
     }
+
     func textView(
         _ textView: UITextView,
         shouldInteractWith URL: URL,

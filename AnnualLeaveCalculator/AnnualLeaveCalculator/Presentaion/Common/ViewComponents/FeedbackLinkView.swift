@@ -64,7 +64,7 @@ final class FeedbackLinkView: UIView {
     private func configureTextLikeTermsViewStyle() {
         let base = [
             NSAttributedString.Key.font: UIFont.pretendard(style: .regular, size: 13),
-            .foregroundColor: UIColor.secondaryLabel
+            .foregroundColor: UIColor(hex: "#BEC1C8")
         ] as [NSAttributedString.Key : Any]
 
         let attr = NSMutableAttributedString(string: fullText, attributes: base)
@@ -76,7 +76,7 @@ final class FeedbackLinkView: UIView {
         if range.location != NSNotFound {
             attr.addAttributes([
                 .font: UIFont.pretendard(style: .bold, size: 13),
-                .foregroundColor: UIColor.systemBlue,
+                .foregroundColor: UIColor.brandColor,
                 .underlineStyle: NSUnderlineStyle.single.rawValue
             ], range: range)
         }
