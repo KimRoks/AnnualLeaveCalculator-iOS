@@ -35,4 +35,14 @@ extension UIColor {
             }
         }
     }
+    
+    static var BackgroundColor: UIColor {
+        UIColor { trait in
+            if trait.userInterfaceStyle == .dark {
+                return UIColor(hex: "#FBFBFB")
+            } else {
+                return UIColor(hex: "#FBFBFB")
+            }
+        }
+    }
 }

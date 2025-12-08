@@ -11,7 +11,7 @@ class BaseViewController: UIViewController, NavigationBarTitlePresentable, Toast
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(hex: "#FBFBFB")
+        view.backgroundColor = .BackgroundColor
         hookInteractivePopGesture()
     }
 
