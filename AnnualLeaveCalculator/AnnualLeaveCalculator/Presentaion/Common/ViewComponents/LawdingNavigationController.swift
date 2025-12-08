@@ -58,7 +58,7 @@ final class LawdingNavigationController: UINavigationController {
     private func setupCommonNavigationBar() {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(hex: "#F5F5F5")
+        appearance.backgroundColor = .BackgroundColor
         appearance.shadowColor = .clear
         
         let titleAttrs: [NSAttributedString.Key: Any] = [
