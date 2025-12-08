@@ -101,7 +101,6 @@ final class LawdingNavigationController: UINavigationController {
             backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         } else {
             viewController.navigationItem.leftBarButtonItem = UIBarButtonItem(customView: titleLabel)
-            viewController.navigationItem.rightBarButtonItem = UIBarButtonItem(customView: infoButton)
         }
         
         let titleText = (viewController as? NavigationBarTitlePresentable)?.navigationTitle
