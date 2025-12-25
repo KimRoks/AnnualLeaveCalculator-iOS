@@ -1,5 +1,5 @@
 //
-//  AnnualLeaveTarget.swift
+//  LawdingServiceTarget.swift
 //  AnnualLeaveCalculator
 //
 //  Created by 김경록 on 8/11/25.
@@ -7,15 +7,7 @@
 
 import Foundation
 
-enum AnnualLeaveTarget {
-    case calculate(
-        calculationType: Int,
-        fiscalYear: String?,
-        hireDate: String,
-        referenceDate: String,
-        nonWorkingPeriods: [NonWorkingPeriod]?,
-        companyHolidays: [String]?
-    )
+enum LawdingServiceTarget {
     case submitFeedback(
         type: String,
         content: String,
@@ -32,11 +24,13 @@ enum AnnualLeaveTarget {
     )
 }
 
-extension AnnualLeaveTarget: TargetType {
+extension LawdingServiceTarget: TargetType {
+    var basePath: String? {
+        return nil
+    }
+    
     var method: HTTPMethods {
         switch self {
-        case .calculate:
-            return .post
         case .submitFeedback:
             return .post
         case .submitRating:
@@ -46,34 +40,16 @@ extension AnnualLeaveTarget: TargetType {
     
     var path: String {
         switch self {
-        case .calculate:
-            return "/calculate"
         case .submitFeedback:
-            return "/feedback"
+            return "/v1/feedback"
         case .submitRating:
-            return "/feedback"
+            return "/v1/feedback"
         }
-    }
-    
-    private var xTestFlag: String {
-        #if DEBUG
-            return "true"
-        #else
-            return "false"
-        #endif
     }
     
     var headers: [String: String]? {
         
         switch self {
-            
-        case .calculate:
-            return [
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-                "X-Platform": "ios",
-                "X-Test": xTestFlag
-            ]
         case .submitFeedback:
             return [
                 "Content-Type": "application/json",
@@ -92,30 +68,6 @@ extension AnnualLeaveTarget: TargetType {
     
     var parameters: [String: Any]? {
         switch self {
-        case .calculate(
-            let calculationType,
-            let fiscalYear,
-            let hireDate,
-            let referenceDate,
-            let nonWorkingPeriods,
-            let companyHolidays
-        ):
-            var dict: [String: Any] = [
-                "calculationType": calculationType,
-                "hireDate": hireDate,
-                "referenceDate": referenceDate
-            ]
-            if let fiscalYear = fiscalYear {
-                dict["fiscalYear"] = fiscalYear
-            }
-            if let nonWorkingPeriods = nonWorkingPeriods {
-                dict["nonWorkingPeriods"] = nonWorkingPeriods.map { $0.asDictionary }
-            }
-            if let companyHolidays = companyHolidays {
-                dict["companyHolidays"] = companyHolidays
-            }
-            return dict
-            
         case .submitFeedback(
             type: let type,
             content: let content,
@@ -156,7 +108,7 @@ extension AnnualLeaveTarget: TargetType {
             if let email = email {
                 dict["email"] = email
             }
-                        
+            
             if let content = content {
                 dict["content"] = content
             }

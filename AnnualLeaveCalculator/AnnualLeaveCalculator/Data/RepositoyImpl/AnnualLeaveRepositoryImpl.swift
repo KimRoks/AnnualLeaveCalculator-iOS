@@ -23,7 +23,7 @@ struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
         nonWorkingPeriods: [NonWorkingPeriod]? = [],
         companyHolidays: [String]? = []
     ) async throws -> CalculationResultDTO {
-        guard let request = try? AnnualLeaveTarget.calculate(
+        guard let request = try? CalculationTarget.calculate(
             calculationType: calculationType,
             fiscalYear: fiscalYear,
             hireDate: hireDate,
@@ -66,7 +66,7 @@ struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
         rating: Int?,
         calculationId: String?
     ) async throws {
-        guard let request = try? AnnualLeaveTarget.submitFeedback(
+        guard let request = try? LawdingServiceTarget.submitFeedback(
             type: type.apiString,
             content: content,
             email: email,
@@ -99,7 +99,7 @@ struct AnnualLeaveRepositoryImpl: AnnualLeaveRepository {
         rating: Int,
         calculationId: String?
     ) async throws {
-        guard let request = try? AnnualLeaveTarget.submitRating(
+        guard let request = try? LawdingServiceTarget.submitRating(
             type: type.apiString,
             content: content,
             email: email,

@@ -15,7 +15,7 @@ enum HTTPMethods: String {
 }
 
 protocol TargetType {
-    var baseURL: String { get }
+    var basePath: String? { get }
     var method: HTTPMethods { get }
     var path: String { get }
     var headers: [String: String]? { get }
@@ -25,6 +25,14 @@ protocol TargetType {
 }
 
 extension TargetType {
+    var xTestFlag: String {
+    #if DEBUG
+        return "true"
+    #else
+        return "false"
+    #endif
+    }
+    
     var baseURL: String {
         if let baseURL = Bundle.main.object(forInfoDictionaryKey: "BASE_URL") as? String {
             return baseURL
@@ -34,8 +42,14 @@ extension TargetType {
         }
     }
     
+    var basePath: String? {
+        return nil
+    }
+    
     func asURLRequest() throws -> URLRequest {
-        guard let fullUrl = URL(string: baseURL + path) else {
+        // basePath 옵셔널 처리
+        let fullPath = (basePath ?? "") + path
+        guard let fullUrl = URL(string: baseURL + fullPath) else {
             throw NetworkError.invalidURLError
         }
         
@@ -63,7 +77,10 @@ extension TargetType {
         default:
             // POST, PATCH, DELETE 등은 JSON 바디 인코딩
             if let params = parameters {
-                urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                // headers에 Content-Type이 없을 때만 추가
+                if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
+                    urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                }
                 urlRequest.httpBody = try JSONSerialization.data(withJSONObject: params, options: [])
             }
         }
